@@ -1,0 +1,35 @@
+{
+  "appId": "com.music.xuan.desktop",
+  "productName": "小轩音乐",
+  "electronVersion": "43.1.1",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "main.cjs",
+    "preload.cjs",
+    "package.json"
+  ],
+  "asar": true,
+  "compression": "normal",
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "signAndEditExecutable": false,
+    "artifactName": "xuan-music-desktop.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "小轩音乐"
+  }
+}

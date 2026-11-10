@@ -1,0 +1,100 @@
+{
+  "version": 2,
+  "_comment": "小轩音乐共享音效预设（Web / Android 同一份参数）。与 client/src/services/audioEffects.ts 中 XUAN_EFFECT_PRESET_DATA 保持一致。全部为公开等效实现，非网易云官方参数。",
+  "presets": {
+    "superBass": {
+      "id": "superBass", "version": 2, "headroomDb": -3.5,
+      "eq": [
+        { "type": "lowshelf", "freq": 110, "gain": 8.5, "q": 0.7 },
+        { "type": "peaking", "freq": 160, "gain": 5, "q": 0.9 },
+        { "type": "peaking", "freq": 1100, "gain": -1.5, "q": 0.8 },
+        { "type": "highshelf", "freq": 7000, "gain": 1.5 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.42, "mix": 0.34 },
+      "stereoWidth": 1.05,
+      "space": { "mode": "none", "wet": 0 },
+      "limiterCeilingDb": -1
+    },
+    "surround3d": {
+      "id": "surround3d", "version": 2, "headroomDb": -4.5,
+      "eq": [
+        { "type": "peaking", "freq": 300, "gain": -1.5, "q": 0.9 },
+        { "type": "peaking", "freq": 2500, "gain": 1.5, "q": 0.8 },
+        { "type": "highshelf", "freq": 8000, "gain": 2 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.12, "mix": 0.15 },
+      "stereoWidth": 1.25,
+      "space": { "mode": "hrtf3d", "wet": 0.55, "spinHz": 0.08, "radius": 1.6 },
+      "limiterCeilingDb": -1
+    },
+    "panoramic": {
+      "id": "panoramic", "version": 2, "headroomDb": -4,
+      "eq": [
+        { "type": "lowshelf", "freq": 90, "gain": 2.5, "q": 0.7 },
+        { "type": "peaking", "freq": 3000, "gain": 1.5, "q": 0.7 },
+        { "type": "highshelf", "freq": 9000, "gain": 3 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.14, "mix": 0.16 },
+      "stereoWidth": 1.65,
+      "space": { "mode": "reverb", "wet": 0.22, "irSeconds": 0.8 },
+      "limiterCeilingDb": -1
+    },
+    "hdVocal": {
+      "id": "hdVocal", "version": 2, "headroomDb": -2.5,
+      "eq": [
+        { "type": "peaking", "freq": 250, "gain": -2.5, "q": 0.9 },
+        { "type": "peaking", "freq": 3200, "gain": 3.5, "q": 0.8 },
+        { "type": "peaking", "freq": 6500, "gain": 2, "q": 1.2 },
+        { "type": "highshelf", "freq": 10000, "gain": 2.5 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.1, "mix": 0.18 },
+      "stereoWidth": 1.08,
+      "space": { "mode": "none", "wet": 0 },
+      "limiterCeilingDb": -1
+    },
+    "clearVocal": {
+      "id": "clearVocal", "version": 2, "headroomDb": -2,
+      "eq": [
+        { "type": "peaking", "freq": 350, "gain": -2, "q": 0.9 },
+        { "type": "peaking", "freq": 1100, "gain": 2.5, "q": 0.8 },
+        { "type": "highshelf", "freq": 8000, "gain": 1.5 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.05, "mix": 0.12 },
+      "stereoWidth": 1.02,
+      "space": { "mode": "none", "wet": 0 },
+      "limiterCeilingDb": -1
+    },
+    "hifiLive": {
+      "id": "hifiLive", "version": 2, "headroomDb": -4,
+      "eq": [
+        { "type": "lowshelf", "freq": 100, "gain": 3, "q": 0.7 },
+        { "type": "peaking", "freq": 1600, "gain": 1, "q": 0.8 },
+        { "type": "highshelf", "freq": 8000, "gain": 2 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.16, "mix": 0.2 },
+      "stereoWidth": 1.4,
+      "space": { "mode": "reverb", "wet": 0.3, "irSeconds": 1.6 },
+      "limiterCeilingDb": -1
+    },
+    "immersive": {
+      "id": "immersive", "version": 2, "headroomDb": -5,
+      "eq": [
+        { "type": "lowshelf", "freq": 95, "gain": 7, "q": 0.7 },
+        { "type": "peaking", "freq": 150, "gain": 4, "q": 0.9 },
+        { "type": "peaking", "freq": 3000, "gain": 2, "q": 0.7 },
+        { "type": "highshelf", "freq": 9000, "gain": 3.5 }
+      ],
+      "glue": { "threshold": -16, "ratio": 4, "attack": 0.008, "release": 0.12, "knee": 10 },
+      "saturation": { "drive": 0.32, "mix": 0.3 },
+      "stereoWidth": 1.55,
+      "space": { "mode": "reverb", "wet": 0.18, "irSeconds": 0.7 },
+      "limiterCeilingDb": -1
+    }
+  }
+}

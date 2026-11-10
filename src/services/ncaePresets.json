@@ -1,0 +1,101 @@
+{
+  "_comment": "小轩音乐 · NCAE 场景音效共享预设（Windows / Android 两端读同一份文件）。参数均为公开等效实现，非网易云官方 NCAE 原始系数；DRC/se 为听感逼近值，不宣称精确复现。ANC（主动降噪）属于耳机硬件链路，与本播放器 DSP 无关，已排除。",
+  "version": 4,
+  "spec": "NCAE scene effect: eq / bt / rvb / se",
+  "chain": ["preamp", "bt", "eq", "drc", "se", "limiter"],
+  "eq": {
+    "freqs": [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
+    "q": 1.2,
+    "note": "10 段标准倍频程图形 EQ；NCAE eq.eqs 只给增益不给 Q，这里按倍频程带宽反推 Q≈1.2（规格建议 1.0~1.4）。"
+  },
+  "bt": {
+    "bassFreq": 90,
+    "trebleFreq": 9000,
+    "q": 0.7,
+    "note": "低音/高音搁架（low_shelf / high_shelf），单位 dB。"
+  },
+  "drc": {
+    "note": "专利 CN114546325A 只把 DRC 列为音效参数之一，未公开阈值/压缩比/时间常数；以下为试听逼近起点，非官方精确值。",
+    "threshold": -18,
+    "ratio": 3,
+    "attack": 0.008,
+    "release": 0.15,
+    "knee": 10
+  },
+  "presets": {
+    "off": {
+      "name": "关闭音效",
+      "preamp": 0,
+      "bt": { "bass": 0, "treble": 0 },
+      "eqs": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "rvb": { "mode": "none", "wet": 0 },
+      "se": { "strength": 0, "depth": 0 },
+      "drc": { "enabled": false }
+    },
+    "superBass": {
+      "_comment": "超重低音：bt 低音 +6dB / 高音 -6dB（对齐网易云鲸云音效『超重低音』组合）；rvb 浴室；se 环绕强度与深度推到最大。eq.eqs 为按用户提供的系统均衡器截图工程化后的等效曲线，不是社区流传的低置信度激进数组。",
+      "name": "超重低音",
+      "preamp": -6,
+      "bt": { "bass": 6, "treble": -6 },
+      "eqs": [3, 4, 6, 6, -4, -4, 1, 1, 0, 0],
+      "rvb": { "mode": "bathroom", "wet": 0.16 },
+      "se": { "strength": 6, "depth": 6 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 4, "attack": 0.005, "release": 0.2, "knee": 8 }
+    },
+    "clearVocal": {
+      "_comment": "清澈人声（吉祥月光茶风格）：bt 低音 0 / 高音 +6dB；se 环绕强度 0、深度 0，刻意收窄声场凸显人声；rvb 用 Livehouse 而非浴室；eq 中频 300Hz~3kHz 适度提升，低频保持或轻微衰减。",
+      "name": "清澈人声",
+      "preamp": -3,
+      "bt": { "bass": 0, "treble": 6 },
+      "eqs": [-3, -2.5, -3.5, -2.5, -1.5, 2.5, 5, 3, 2, 1],
+      "rvb": { "mode": "livehouse", "wet": 0.08 },
+      "se": { "strength": 0, "depth": 0 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 2, "attack": 0.01, "release": 0.1, "knee": 12 }
+    },
+    "surround3d": {
+      "name": "3D 环绕",
+      "preamp": -5,
+      "bt": { "bass": 0, "treble": 2 },
+      "eqs": [-1, -1, -2, -2.5, -1, 1.5, 2.5, 2.5, 1.5, 1],
+      "rvb": { "mode": "none", "wet": 0 },
+      "se": { "strength": 5, "depth": 4 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 3, "attack": 0.008, "release": 0.15, "knee": 10 }
+    },
+    "panoramic": {
+      "name": "全景环绕",
+      "preamp": -4.5,
+      "bt": { "bass": 2, "treble": 2.5 },
+      "eqs": [1.5, 1, 0, -1, -1, 1.5, 2.5, 3.5, 3, 2],
+      "rvb": { "mode": "livehouse", "wet": 0.12 },
+      "se": { "strength": 4, "depth": 3 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 2, "attack": 0.01, "release": 0.15, "knee": 12 }
+    },
+    "hdVocal": {
+      "name": "高解析人声",
+      "preamp": -3.5,
+      "bt": { "bass": -1, "treble": 3 },
+      "eqs": [-2.5, -2, -3, -2.5, -1, 4, 6, 4.5, 3, 2],
+      "rvb": { "mode": "none", "wet": 0 },
+      "se": { "strength": 0, "depth": 0 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 2, "attack": 0.01, "release": 0.1, "knee": 12 }
+    },
+    "hifiLive": {
+      "name": "HiFi 现场",
+      "preamp": -4.5,
+      "bt": { "bass": 2.5, "treble": 2 },
+      "eqs": [3.5, 2.5, 1.5, -1, -1, 2, 3.5, 4.5, 3.5, 2.5],
+      "rvb": { "mode": "livehouse", "wet": 0.18 },
+      "se": { "strength": 3, "depth": 3 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 2, "attack": 0.01, "release": 0.18, "knee": 12 }
+    },
+    "immersive": {
+      "name": "震撼全景",
+      "preamp": -6,
+      "bt": { "bass": 5.5, "treble": 2.5 },
+      "eqs": [6, 5, 3, -1.5, -1.5, 2.5, 4, 5, 3.5, 2.5],
+      "rvb": { "mode": "bathroom", "wet": 0.12 },
+      "se": { "strength": 6, "depth": 5 },
+      "drc": { "enabled": true, "threshold": -18, "ratio": 4, "attack": 0.005, "release": 0.2, "knee": 8 }
+    }
+  }
+}
