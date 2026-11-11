@@ -399,6 +399,7 @@
     "guestMode": "游客模式",
     "loginOnHome": "去主页登入",
     "audioQuality": "默认音質",
+    "qualityAuto": "自動（最高可用）",
     "qualityStandard": "標準",
     "qualityExhigh": "極高",
     "qualityLossless": "無損",

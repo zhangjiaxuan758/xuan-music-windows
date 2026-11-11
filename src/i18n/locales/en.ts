@@ -397,6 +397,7 @@
     "guestMode": "Guest Mode",
     "loginOnHome": "Login on Home",
     "audioQuality": "Default Quality",
+    "qualityAuto": "Auto (Best Available)",
     "qualityStandard": "Standard",
     "qualityExhigh": "Very High",
     "qualityLossless": "Lossless",

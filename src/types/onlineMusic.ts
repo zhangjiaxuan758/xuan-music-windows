@@ -11,7 +11,7 @@ export type OnlineProviderId = 'netease' | (string & {});
  * 旧值 'high' 保留兼容（等价 exhigh）。
  */
 export type AudioQualityPreference =
-    | 'standard' | 'higher' | 'high' | 'exhigh'
+    | 'auto' | 'standard' | 'higher' | 'high' | 'exhigh'
     | 'lossless' | 'hires' | 'jyeffect' | 'sky' | 'jymaster';
 export type ProviderCatalogEntityKind = 'album' | 'artist' | 'playlist';
 

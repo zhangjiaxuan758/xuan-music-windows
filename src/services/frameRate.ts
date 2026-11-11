@@ -6,7 +6,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 
 export const FRAME_RATE_STORAGE_KEY = 'xuan_frame_rate';
 // 0 = 自动（设备最高帧率）
-export type FrameRatePref = 0 | 30 | 60 | 90 | 120 | 144;
+export type FrameRatePref = 0 | 30 | 60 | 90 | 120 | 144 | 165;
 
 interface XuanNativeFrameRate {
   getSupportedFrameRates(): Promise<{ rates: number[] }>;
@@ -28,7 +28,7 @@ const native = (): XuanNativeFrameRate | null => {
 export const readFrameRatePref = (): FrameRatePref => {
   try {
     const v = Number(localStorage.getItem(FRAME_RATE_STORAGE_KEY) ?? '0');
-    return ([0, 30, 60, 90, 120, 144] as number[]).includes(v) ? (v as FrameRatePref) : 0;
+    return ([0, 30, 60, 90, 120, 144, 165] as number[]).includes(v) ? (v as FrameRatePref) : 0;
   } catch { return 0; }
 };
 

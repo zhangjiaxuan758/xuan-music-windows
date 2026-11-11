@@ -131,23 +131,29 @@ const matchesCategory = (key: string, category: CacheCategory): boolean => {
 };
 
 export const getBrowserCacheUsage = async (): Promise<number> => {
-  const entries = await Promise.all(CACHE_TABLE_NAMES.map(name => getTable(name).toArray()));
-  return entries.flat().reduce((total, entry) => total + getEntrySize(entry), 0);
+  let total = 0;
+  // 流式逐条累加：toArray 会把整表（含全部音频 Blob）物化进内存，
+  // 缓存多首大文件后极易 OOM/超时，外层 catch 后表现为「缓存统计恒 0」。
+  for (const name of CACHE_TABLE_NAMES) {
+    await getTable(name).each(entry => { total += getEntrySize(entry); });
+  }
+  return total;
 };
 
 export const getBrowserCacheUsageByCategory = async () => {
   const usage = { playlist: 0, lyrics: 0, cover: 0, media: 0, mediaCount: 0 };
-  const entries = (await Promise.all(CACHE_TABLE_NAMES.map(name => getTable(name).toArray()))).flat();
-  entries.forEach(entry => {
-    const size = getEntrySize(entry);
-    if (matchesCategory(entry.key, 'playlist') || USER_CACHE_KEYS.has(entry.key)) usage.playlist += size;
-    else if (matchesCategory(entry.key, 'lyrics')) usage.lyrics += size;
-    else if (matchesCategory(entry.key, 'cover')) usage.cover += size;
-    else if (matchesCategory(entry.key, 'media')) {
-      usage.media += size;
-      usage.mediaCount += 1;
-    }
-  });
+  for (const name of CACHE_TABLE_NAMES) {
+    await getTable(name).each(entry => {
+      const size = getEntrySize(entry);
+      if (matchesCategory(entry.key, 'playlist') || USER_CACHE_KEYS.has(entry.key)) usage.playlist += size;
+      else if (matchesCategory(entry.key, 'lyrics')) usage.lyrics += size;
+      else if (matchesCategory(entry.key, 'cover')) usage.cover += size;
+      else if (matchesCategory(entry.key, 'media')) {
+        usage.media += size;
+        usage.mediaCount += 1;
+      }
+    });
+  }
   return usage;
 };
 

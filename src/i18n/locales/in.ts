@@ -382,6 +382,7 @@
     "guestMode": "Mode Tamu",
     "loginOnHome": "Login di Beranda",
     "audioQuality": "Kualitas Bawaan",
+    "qualityAuto": "Otomatis (Terbaik)",
     "qualityStandard": "Standar",
     "qualityExhigh": "Sangat Tinggi",
     "qualityLossless": "Lossless",

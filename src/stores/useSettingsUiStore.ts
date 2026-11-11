@@ -129,25 +129,18 @@ const readStoredDisableHomeDynamicBackground = (): boolean => {
     return false;
 };
 
-/** 官方全部档位（含旧值 'high' 兼容）；默认极高（登录免费可用的最高档）。 */
+/** 官方全部档位（含旧值 'high' 兼容 + 自动档）。 */
 const ALL_QUALITIES: readonly string[] = [
-    'standard', 'higher', 'exhigh', 'high', 'lossless', 'hires', 'jyeffect', 'sky', 'jymaster',
+    'auto', 'standard', 'higher', 'exhigh', 'high', 'lossless', 'hires', 'jyeffect', 'sky', 'jymaster',
 ];
 
 export const resolveStoredAudioQuality = (saved: string | null): AudioQuality => {
     if (saved && ALL_QUALITIES.includes(saved)) {
         return (saved === 'high' ? 'exhigh' : saved) as AudioQuality;
     }
-    // 无本地偏好时采用管理端下发的默认档（quality.default），再退极高
-    try {
-        const remote = getServerConfig()?.quality?.default;
-        if (remote && ALL_QUALITIES.includes(remote)) {
-            return (remote === 'high' ? 'exhigh' : remote) as AudioQuality;
-        }
-    } catch { /* ignore */ }
-    // 未登录 / 非会员可用最高档为「极高」(exhigh)；不再默认超清母带。
-    // 会员档只在用户手动点击或确认是会员后才使用。
-    return 'exhigh';
+    // 无本地偏好时默认「自动」：按账号权限播放能用的最高音质
+    // （会员=超清母带起步，非会员=极高起步，官方按权限自动降级），用户可随时手动改。
+    return 'auto';
 };
 
 const readStoredAudioQuality = (): AudioQuality => {
@@ -155,17 +148,14 @@ const readStoredAudioQuality = (): AudioQuality => {
         return 'exhigh';
     }
 
-    // 一次性迁移：旧版本在「未登录」或登录成功时把 standard 落盘为默认档，
-    // 升级后会被当成用户偏好读回，导致音质仍不是最高。这里只执行一次，
-    // 之后用户手动切换的档位会正常保留。
+    // 一次性迁移：旧版本落盘的默认档（standard / jymaster / exhigh）统一迁到
+    // 「自动」= 账号最高可用音质；此后用户手动切换的档位会正常保留。
     try {
         if (localStorage.getItem('xuan_quality_highest_migrated') !== '1') {
             localStorage.setItem('xuan_quality_highest_migrated', '1');
             const prev = localStorage.getItem('default_audio_quality');
-            // 旧版自动落盘 jymaster（超清母带）会让未登录也显示会员档，
-            // 统一迁移到「极高」；此后用户手动选择的档位不再被改写。
-            if (!prev || prev === 'standard' || prev === 'jymaster') {
-                localStorage.setItem('default_audio_quality', 'exhigh');
+            if (!prev || prev === 'standard' || prev === 'jymaster' || prev === 'exhigh') {
+                localStorage.setItem('default_audio_quality', 'auto');
             }
         }
     } catch { /* ignore */ }

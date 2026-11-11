@@ -28,11 +28,23 @@ const XuanCppVisualizer: React.FC<Props> = ({ analyserRef }) => {
         let raf = 0;
         let freqData: Uint8Array<ArrayBuffer> | null = null;
         let lastBins = 0;
+        // 每帧复用同一份 RGBA 缓冲：此前每帧 new 518KB，60fps 下每秒 31MB 垃圾，
+        // 主线程 GC 会挤占 ScriptProcessorNode 的音频时隙，造成周期性咔哒杂音。
+        let frameBuf: Uint8ClampedArray | null = null;
+        let imageData: ImageData | null = null;
+        // 渲染节流：30fps 起步；设备跑不动时自适应降到 20/15fps，保播放优先。
+        let frameInterval = 1000 / 30;
+        let lastRender = 0;
+        let slowStreak = 0;
 
         getXuanCppEngine().then(e => { if (!disposed) engine = e; });
 
-        const loop = () => {
+        const loop = (nowMs: number) => {
             raf = requestAnimationFrame(loop);
+            if (document.hidden || disposed) return;
+            if (nowMs - lastRender < frameInterval) return;
+            const renderStart = nowMs;
+            lastRender = nowMs;
             const canvas = canvasRef.current;
             if (!canvas || !engine) return;
             const eng = engine as XuanCppEngine;
@@ -66,11 +78,31 @@ const XuanCppVisualizer: React.FC<Props> = ({ analyserRef }) => {
             }
 
             // 2) C++ 生成一帧 RGBA
-            eng.render(w, h, performance.now() / 1000, BANDS);
+            eng.render(w, h, nowMs / 1000, BANDS);
 
-            // 3) 呈现（复制一份，避免 WASM 内存视图被 ImageData 直接持有）
-            const frame = new Uint8ClampedArray(eng.frame);
-            ctx.putImageData(new ImageData(frame, w, h), 0, 0);
+            // 3) 呈现（拷进复用缓冲，避免每帧分配；putImageData 同步拷贝后即可复用）
+            if (!frameBuf || frameBuf.length !== eng.frame.length) {
+                frameBuf = new Uint8ClampedArray(eng.frame.length);
+                imageData = ctx.createImageData(w, h);
+            }
+            frameBuf.set(eng.frame);
+            if (imageData) {
+                imageData.data.set(frameBuf);
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // 自适应帧率：连续多帧超时则降档（30 -> 20 -> 15fps）
+            const cost = performance.now() - renderStart;
+            if (cost > frameInterval * 0.8) {
+                slowStreak++;
+                if (slowStreak >= 20) {
+                    slowStreak = 0;
+                    if (frameInterval < 1000 / 15) frameInterval = 1000 / 20;
+                    else frameInterval = 1000 / 15;
+                }
+            } else {
+                slowStreak = 0;
+            }
         };
         raf = requestAnimationFrame(loop);
         return () => { disposed = true; cancelAnimationFrame(raf); };

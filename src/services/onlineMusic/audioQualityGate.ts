@@ -35,6 +35,7 @@ export const normalizeQuality = (quality: AudioQualityPreference): AudioQualityP
  */
 export const qualityTier = (quality: AudioQualityPreference): QualityTier => {
     const q = normalizeQuality(quality);
+    if (q === 'auto') return 'free'; // 自动档按账号权限动态解析最高可用，不做门槛
     if (q === 'lossless' || q === 'hires' || q === 'jyeffect' || q === 'sky' || q === 'jymaster') return 'vip';
     if (q === 'exhigh') return 'login';
     return 'free';
@@ -105,6 +106,9 @@ export const resolveEffectiveQuality = (
     isVip: boolean,
 ): AudioQualityPreference => {
     const q = normalizeQuality(quality);
+    // 「自动」= 账号能播放的最高档：会员从超清母带起步、非会员从极高起步，
+    // 官方取链接口按账号权限自动降级，最终以官方 br/level 显示真实档位。
+    if (q === 'auto') return isVip ? 'jymaster' : 'exhigh';
     // 官方对非会员请求 lossless/hires/sky/jymaster 一律降级，
     // 这里直接从源头压到极高(320k)，不再向官方索取会员档位。
     if (!isVip && (q === 'lossless' || q === 'hires' || q === 'jyeffect' || q === 'sky' || q === 'jymaster')) {

@@ -4,7 +4,7 @@ import { PlayerState } from '../types';
 import type { ReplayGainMode, SongResult, StatusMessage } from '../types';
 import type { LocalSong } from '../types';
 import { CapacitorHttp } from '@capacitor/core';
-import { saveAudioBlob } from '../services/audioCache';
+import { saveAudioBlob, decodeBase64ToBlobAsync } from '../services/audioCache';
 import { hasCachedSongAudio, getSongAudioCacheKey } from '../services/onlineMusic/resourceCache';
 import { getSongResourceCacheKey } from '../services/onlineMusic/resourceKeys';
 import { resolveNavidromePlaybackCarrier } from '../utils/appPlaybackGuards';
@@ -60,12 +60,11 @@ const downloadBlobViaNative = async (url: string): Promise<Blob> => {
     const comma = raw.indexOf(',');
     if (raw.startsWith('data:') && comma > 0) raw = raw.slice(comma + 1);
     if (!raw) throw new Error('native download empty body');
-    const binary = atob(raw);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
     const headers = response.headers ?? {};
     const contentType = headers['Content-Type'] || headers['content-type'] || 'audio/mpeg';
-    return new Blob([bytes.buffer as ArrayBuffer], { type: contentType });
+    // base64 → Blob 的解码放进 Worker：主线程被 atob/循环阻塞数百毫秒会压垮
+    // ScriptProcessorNode 的音频时隙，播放途中产生咔哒杂音。
+    return await decodeBase64ToBlobAsync(raw, contentType);
 };
 
 // Bridges audio element setup, autoplay, replay gain, and media caching.
@@ -155,6 +154,14 @@ export function usePlaybackAudioBridge({
             const blob = await downloadBlobViaNative(audioSrc);
             if (blob.size === 0) return;
             await saveAudioBlob(getSongAudioCacheKey(currentSong), blob);
+            // 回读验证：IndexedDB 写失败（配额满等）在 saveToCache 内部被吞，
+            // 不验证的话「缓存」tab 会假成功，而设置里已缓存歌曲永远是 0。
+            const verified = await hasCachedSongAudio(currentSong);
+            if (!verified) {
+                console.error('[Cache] Audio save verification failed (likely quota), skip tab record');
+                setStatusMsg({ type: 'error', text: '存储空间不足，本歌未缓存', durationMs: 4000 });
+                return;
+            }
             // 记录到首页「缓存」tab（最多 100 首），并通知首页立即刷新。
             try {
                 const raw = localStorage.getItem('xuan_cached_media_songs');
