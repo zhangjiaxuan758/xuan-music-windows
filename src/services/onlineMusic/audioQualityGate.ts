@@ -3,7 +3,7 @@ import { readProviderSessionValue } from './providerStorage';
 
 // 小轩音乐：音质档位的登录 / 会员门槛。
 //
-// 音质本身是网易云官方 /api/song/enhance/player/url/v1 的 level 参数直连：
+// 音质由网易云官方取链接口的 level 参数直连：
 //   standard 标准(128k) / higher 较高(192k) / exhigh 极高(320k)
 //   lossless 无损(FLAC) / hires Hi-Res
 // 官方对「未登录」「非会员」的高码率请求会降级或返回受限，这里在端到端对齐
@@ -118,7 +118,7 @@ export const resolveEffectiveQuality = (
 };
 
 /**
- * 用官方 /api/song/enhance/player/url/v1 的返回反推实际音质。
+ * 用官方取链接口的返回反推实际音质。
  * 优先用官方 level 字段（standard/higher/exhigh/lossless/hires/sky/jymaster），
  * 缺失时按码率(br)反推。官方会按账号权限降级，所以"当前用上了哪一档"
  * 必须以官方返回为准，不能用用户点选的档位。

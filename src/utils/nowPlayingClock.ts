@@ -1,8 +1,9 @@
 import type { NowPlayingLyricPayload, NowPlayingTrackSnapshot } from '../types';
+import { EP } from '../services/secretBox';
 
 // src/utils/nowPlayingClock.ts
 
-export const NOW_PLAYING_PROGRESS_QUERY_URL = 'http://localhost:9863/api/query/progress';
+export const NOW_PLAYING_PROGRESS_QUERY_URL = 'http://localhost:9863' + EP[3];
 export const NOW_PLAYING_PROGRESS_POLL_INTERVAL_MS = 7000;
 export const NOW_PLAYING_PROGRESS_CORRECTION_THRESHOLD_SEC = 0.2;
 

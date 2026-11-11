@@ -1,7 +1,8 @@
 import React from 'react';
 import { BookOpen, Music2, Search, Heart, SlidersHorizontal, WifiOff, ExternalLink as HelpLink } from 'lucide-react';
 
-export const XUAN_HELP_DOC_URL = 'https://music.jrr.lol/help.html';
+import { HELP_DOC_URL } from '../../services/secretBox';
+export const XUAN_HELP_DOC_URL = HELP_DOC_URL;
 
 /** 小轩音乐自编的帮助文档：内容围绕本应用，仓库链接指向用户自己的 xuan-music。 */
 export const XuanHelpDoc: React.FC<{ isDaylight: boolean }> = ({ isDaylight }) => {

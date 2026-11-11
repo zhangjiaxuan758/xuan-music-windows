@@ -280,7 +280,7 @@ export const neteaseProvider: OnlineMusicProvider = {
             // 任何登录态都从官方支持的最高档起步，依次降级重试，
             // 只要任一档位能拿到可播放地址就立即返回。官方按账号权限
             // 自动降级，天然实现「永远拿到该账号能播的最高音质」。
-            // 会员身份来自官方 /api/w/nuser/account/get + /api/nuser/account/get
+            // 会员身份来自官方账号信息接口
             // 返回的 profile.vipType；官方 profile 不带该字段时视为「未知」并放行，
             // 由官方取链接口做最终判定，避免把真会员误判成非会员。
             const accountUser = useOnlineProviderAccountStore.getState().accounts?.['netease']?.user;

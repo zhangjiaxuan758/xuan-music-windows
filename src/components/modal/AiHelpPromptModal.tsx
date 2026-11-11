@@ -9,8 +9,9 @@ import { X as CloseIcon } from 'lucide-react';
 // src/components/modal/AiHelpPromptModal.tsx
 
 // 小轩音乐：「遇到问题 / 使用说明」文档一律跳到自建 help.html。
-const XUAN_GUIDE_URL = 'https://music.jrr.lol/help.html';
-const XUAN_DOCS_URL = 'https://music.jrr.lol/help.html';
+import { HELP_DOC_URL } from '../../services/secretBox';
+const XUAN_GUIDE_URL = HELP_DOC_URL;
+const XUAN_DOCS_URL = HELP_DOC_URL;
 
 type AiHelpPromptModalProps = {
     isOpen: boolean;

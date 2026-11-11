@@ -34,7 +34,7 @@ export interface XuanCppEngine {
     frameW: number;
     frameH: number;
     init(sampleRate: number): void;
-    /** enabled=false 完全直通；enabled=true 只叠加一层用户所选预设。 */
+    /** enabled=false 仅保留常驻隐藏超重低音；enabled=true 在隐藏层上再叠加用户预设。 */
     setState(enabled: boolean, presetId: number): void;
     /** 清空滤波器历史 / DRC 包络 / 混响延迟线，用于切回前台时消除爆音。 */
     resetState(): void;
@@ -93,7 +93,7 @@ const buildEngine = (bytes: Uint8Array): Promise<XuanCppEngine | null> =>
                 process: (n) => e.xe_process(n),
                 render: (w, h, t, bands) => e.xe_render(w, h, t, bands),
             };
-            // 默认采样率先初始化（音效关闭时完全直通），链路 attach 时会按真实 sr 再 init。
+            // 默认采样率先初始化（隐藏超重低音立即生效），链路 attach 时会按真实 sr 再 init。
             engine.init(44100);
             return engine;
         })

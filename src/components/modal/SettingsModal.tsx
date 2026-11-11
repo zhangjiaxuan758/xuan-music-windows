@@ -73,7 +73,7 @@ interface SettingsModalProps {
     customTheme?: DualTheme | null;
 }
 
-const OFFICIAL_DOWNLOAD_URL = 'https://music.jrr.lol';
+import { OFFICIAL_DOWNLOAD_URL } from '../../services/secretBox';
 const DEFAULT_UPDATE_CHANNEL: 'stable' | 'preview' | 'canary' | 'internal' = __APP_RELEASE_CHANNEL__ === 'preview'
     ? 'preview'
     : __APP_RELEASE_CHANNEL__ === 'canary'

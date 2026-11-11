@@ -2876,10 +2876,55 @@ async function setMainWindowTransparentModeFromRemote(enabled) {
   return setMainWindowTransparentMode(enabled, handoff);
 }
 
+/* 应用级快捷键（应用菜单加速键，无边框窗口下同样生效）：
+ * 编辑类 Ctrl+C/X/V/Z/A 在输入框内可用；缩放 / 全屏 / 窗口控制为桌面端标准操作。
+ * 不注册 DevTools 加速键，避免给逆向留调试入口。 */
+function setupApplicationShortcuts() {
+  const isMac = process.platform === 'darwin';
+  const template = [
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [{ role: 'about' }, { type: 'separator' }, { role: 'quit' }],
+    }] : []),
+    {
+      label: '编辑',
+      submenu: [
+        { role: 'undo', label: '撤销' },
+        { role: 'redo', label: '重做' },
+        { type: 'separator' },
+        { role: 'cut', label: '剪切' },
+        { role: 'copy', label: '复制' },
+        { role: 'paste', label: '粘贴' },
+        { role: 'selectAll', label: '全选' },
+      ],
+    },
+    {
+      label: '视图',
+      submenu: [
+        { role: 'resetZoom', label: '重置缩放' },
+        { role: 'zoomIn', label: '放大' },
+        { role: 'zoomOut', label: '缩小' },
+        { type: 'separator' },
+        { role: 'togglefullscreen', label: '全屏' },
+      ],
+    },
+    {
+      label: '窗口',
+      submenu: [
+        { role: 'minimize', label: '最小化' },
+        { role: 'close', label: '关闭窗口' },
+      ],
+    },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
 app.whenReady().then(async () => {
   if (process.platform === 'win32') {
     app.setAppUserModelId(WINDOWS_APP_USER_MODEL_ID);
   }
+
+  setupApplicationShortcuts();
 
   setupFileSystemAccessPermissionHandlers();
   setupCorsBypassHandlers();

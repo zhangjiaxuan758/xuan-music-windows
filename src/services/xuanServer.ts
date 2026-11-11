@@ -11,12 +11,13 @@
  */
 
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
+import { EP, SERVER_URL, SIGN_SECRET } from './secretBox';
 
-export const XUAN_SERVER = 'https://music.jrr.lol';
+export const XUAN_SERVER = SERVER_URL;
 
 // 应用级签名密钥：仅用于「证明请求来自本应用」，不是敏感信息。
 // 真正的 eapi 密钥 / 管理口令只存在服务端。
-const APP_SIGN_SECRET = 'xuan-app-sign-v1-9f3c2a71e5d8b4601';
+const APP_SIGN_SECRET = SIGN_SECRET;
 
 export interface XuanTab { id: string; label: string; visible: boolean; order: number }
 export interface XuanDevPick { id: number; name: string; artist: string }
@@ -76,7 +77,7 @@ function nonce(): string {
 
 async function ensureTicket(): Promise<string> {
   if (ticket && Date.now() < ticketExpire - 5000) return ticket;
-  const r = await rawGet('/api/ticket');
+  const r = await rawGet(EP[42]);
   if (r.ok && r.data?.ticket) {
     ticket = r.data.ticket;
     ticketExpire = Date.now() + (r.data.ttl || 60) * 1000;
@@ -165,7 +166,7 @@ function applyConfig(next: XuanConfig) {
 }
 
 export async function fetchServerConfig(): Promise<XuanConfig | null> {
-  const r = await signedRequest<{ ok: boolean; version: number } & XuanConfig>('GET', '/api/config');
+  const r = await signedRequest<{ ok: boolean; version: number } & XuanConfig>('GET', EP[43]);
   if (r && r.ok && (r as any).tabs) { applyConfig(r as unknown as XuanConfig); return cfg; }
   return cfg;
 }
@@ -176,7 +177,7 @@ async function openSSE() {
   sseAbort?.abort();
   sseAbort = new AbortController();
   const t = await ensureTicket();
-  const url = `${XUAN_SERVER}/api/stream?ticket=${encodeURIComponent(t)}`;
+  const url = `${XUAN_SERVER}${EP[52]}${encodeURIComponent(t)}`;
   try {
     if (isNative()) {
       // CapacitorHttp 不支持流式，native 端用低间隔增量轮询兜底（同样不重启、热应用）
@@ -258,7 +259,7 @@ export async function initXuanServer() {
 export async function eapiRequest(apiPath: string, data: Record<string, unknown>, cookie: string): Promise<{ body: any; setCookie: string }> {
   const payload = JSON.stringify({ path: apiPath, data, cookie });
   const r = await signedRequest<{ ok: boolean; body: any; setCookie: string; code: number; message: string }>(
-    'POST', '/api/eapi', { path: apiPath, data, cookie });
+    'POST', EP[44], { path: apiPath, data, cookie });
   if (!r) return { body: { code: -1, message: '无法连接服务端' }, setCookie: '' };
   if (r.ok) return { body: (r as any).body ?? r, setCookie: (r as any).setCookie || '' };
   return { body: { code: -1, message: (r as any).message || '服务端请求失败' }, setCookie: '' };
@@ -266,7 +267,7 @@ export async function eapiRequest(apiPath: string, data: Record<string, unknown>
 
 // ---------------------------------------------------------------- 更新检查
 export async function checkUpdate(notify = true, platform: 'android' | 'windows' = 'android'): Promise<UpdateInfo | null> {
-  const path = platform === 'windows' ? '/api/update/check-win' : '/api/update/check';
+  const path = platform === 'windows' ? EP[45] : EP[46];
   const r = await signedRequest<UpdateInfo & { ok: boolean }>('GET', path);
   if (!r || !r.ok) return null;
   const info: UpdateInfo = {
@@ -285,22 +286,22 @@ export async function downloadUrl(path: string): Promise<string> {
 
 // ---------------------------------------------------------------- 管理端 API（管理端 App 复用本文件）
 export async function adminLogin(password: string): Promise<string | null> {
-  const r = await signedRequest<{ token: string }>('POST', '/api/admin/login', { password });
+  const r = await signedRequest<{ token: string }>('POST', EP[47], { password });
   return r?.token || null;
 }
 export async function adminGetConfig(token: string): Promise<XuanConfig | null> {
-  const r = await signedRequest<XuanConfig & { ok: boolean }>('GET', '/api/admin/config', undefined, token);
+  const r = await signedRequest<XuanConfig & { ok: boolean }>('GET', EP[48], undefined, token);
   return r && (r as any).tabs ? r : null;
 }
 export async function adminSaveConfig(token: string, config: XuanConfig): Promise<boolean> {
-  const r = await signedRequest<{ ok: boolean }>('POST', '/api/admin/config', config, token);
+  const r = await signedRequest<{ ok: boolean }>('POST', EP[48], config, token);
   return !!r?.ok;
 }
 export async function adminUploadApk(token: string, file: Blob, name: string, versionCode: number, versionName: string, changelog: string): Promise<boolean> {
   const ab = await file.arrayBuffer();
   const body = new Uint8Array(ab);
-  const headers = await signHeaders('POST', '/api/admin/apk', '', token, body);
-  const url = XUAN_SERVER + '/api/admin/apk';
+  const headers = await signHeaders('POST', EP[49], '', token, body);
+  const url = XUAN_SERVER + EP[49];
   try {
     const r = await fetch(url, {
       method: 'POST',
@@ -319,6 +320,6 @@ export async function adminUploadApk(token: string, file: Blob, name: string, ve
 }
 
 export async function adminChangePassword(token: string, password: string): Promise<boolean> {
-  const r = await signedRequest<{ ok: boolean }>('POST', '/api/admin/password', { password }, token);
+  const r = await signedRequest<{ ok: boolean }>('POST', EP[50], { password }, token);
   return !!r?.ok;
 }

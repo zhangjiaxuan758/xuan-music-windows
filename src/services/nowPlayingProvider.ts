@@ -1,10 +1,11 @@
 import type { NowPlayingConnectionStatus, NowPlayingLyricPayload, NowPlayingTrackSnapshot } from '../types';
+import { EP } from './secretBox';
 
-export const NOW_PLAYING_WS_URL = 'ws://localhost:9863/api/ws/lyric';
+export const NOW_PLAYING_WS_URL = 'ws://localhost:9863' + EP[2];
 const NOW_PLAYING_RECONNECT_DELAY_MS = 2000;
 
 // Build the now-playing lyric WS URL from a host (e.g. 'localhost:9863'); lets the OBS web page pick the endpoint via a URL param.
-export const buildNowPlayingWsUrl = (host: string): string => `ws://${host}/api/ws/lyric`;
+export const buildNowPlayingWsUrl = (host: string): string => `ws://${host}${EP[2]}`;
 
 type NowPlayingTrackMessage = {
     author?: string;

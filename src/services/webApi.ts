@@ -1,4 +1,5 @@
 import { isCapacitorAndroid } from '../platform/runtime';
+import { EP } from './secretBox';
 
 // 当前文件：解析 Web 与 Capacitor 共用的 Xuan 服务端 API 地址。
 
@@ -40,5 +41,5 @@ export const resolveXuanApiUrl = (
     throw new Error('VITE_XUAN_API_BASE must be configured for the Capacitor Android build.');
   }
 
-  return `/api/${normalizedEndpoint}`;
+  return `${EP[51]}${normalizedEndpoint}`;
 };

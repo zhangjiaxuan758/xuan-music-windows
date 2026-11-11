@@ -206,7 +206,7 @@ const forwardState = (enabled: boolean, presetIndex: number): void => {
     }
 };
 
-/** 把当前设置推送给 C++ 引擎。音效关闭时 C++ 完全直通（bit-transparent）。 */
+/** 把当前设置推送给 C++ 引擎。音效关闭时 C++ 仍保留常驻隐藏超重低音层。 */
 const applySettings = (settings?: XuanAudioEffectSettings): void => {
     const s = settings || readXuanAudioEffects();
     const presetId: XuanEffectPreset = s.enabled && s.preset !== 'off' ? s.preset : 'off';

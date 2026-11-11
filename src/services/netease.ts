@@ -17,8 +17,9 @@ let songCopyrightRecommendationApiSupported: boolean | null = null;
 // 因此不存在第三方实例机房 IP 被风控的问题。
 const OFFICIAL_HOST = 'https://music.163.com';
 // 敏感信息（eapiKey / eapiSalt / 开放平台密钥）全部保存在服务端 music.jrr.lol，
-// 客户端不再持有任何密钥：所有官方请求经 /api/eapi 由服务端加密转发。
+// 客户端不再持有任何密钥：所有官方请求由服务端加密转发。
 import { eapiRequest } from './xuanServer';
+import { EP } from './secretBox';
 
 const DEVICE_COOKIE = 'os=android; osver=13; appver=8.10.30; versioncode=270; channel=netease; deviceId=xuanmusic-android; resolution=1920x1080;';
 const DEVICE_HEADER: Record<string, string> = {
@@ -93,7 +94,7 @@ const mergeCookie = (existing: string, incoming: string): string => {
   return Array.from(map.entries()).map(([k, v]) => `${k}=${v}`).join('; ');
 };
 
-// eapi 加密已迁移至服务端 /api/eapi：客户端不持有任何 eAPI 密钥。
+// eapi 加密已迁移至服务端：客户端不持有任何 eAPI 密钥。
 // 这样源码可完全脱敏，网页端无跨域问题，管理端可实时轮换密钥而客户端无需升级。
 type EapiResult = { body: any; setCookie: string };
 
@@ -145,7 +146,7 @@ const detailIdsAsJson = (raw: string): string =>
 // 官方响应大多与上层期望同构，直接透传；少数登录接口需包装。
 const ENDPOINT_MAP: Record<string, EndpointSpec> = {
   '/login/qr/key': {
-    path: '/api/login/qrcode/unikey',
+    path: EP[4],
     // 官方 /login/qrcode/unikey 设备档位：type=1 网页版、type=3 PC 桌面客户端。
     // type=2 是第三方/穿戴设备档，缺 deviceId/appName 会让确认页显示「登录null」。
     // 桌面版（preload 注入 __xuanDesktop）走 3，网易云 App 确认页显示「登录PC端」。
@@ -162,7 +163,7 @@ const ENDPOINT_MAP: Record<string, EndpointSpec> = {
     },
   },
   '/login/qr/check': {
-    path: '/api/login/qrcode/client/login',
+    path: EP[5],
     data: (q) => ({ key: str(q, 'key'), type: qrLoginType() }),
     wrap: (body, _q, setCookie) => {
       const result: any = { ...body };
@@ -171,7 +172,7 @@ const ENDPOINT_MAP: Record<string, EndpointSpec> = {
     },
   },
   '/login/status': {
-    path: '/api/w/nuser/account/get',
+    path: EP[6],
     data: () => ({}),
     wrap: (body, _q, setCookie) => ({
       code: Number(body?.code ?? 200),
@@ -179,31 +180,31 @@ const ENDPOINT_MAP: Record<string, EndpointSpec> = {
       ...(setCookie ? { cookie: mergeCookie(readLoginCookie(), setCookie) } : {}),
     }),
   },
-  '/user/account': { path: '/api/nuser/account/get', data: () => ({}) },
+  '/user/account': { path: EP[7], data: () => ({}) },
   '/logout': {
-    path: '/api/logout',
+    path: EP[8],
     data: () => ({}),
     wrap: (body) => { removeProviderSessionValue('netease', 'cookie', ['netease_cookie']); return body; },
   },
   '/like': {
-    path: '/api/song/like',
+    path: EP[9],
     data: (q) => ({ alg: 'itembased', trackId: str(q, 'id'), like: str(q, 'like') === 'true' || str(q, 'like') === '1', time: 3 }),
   },
-  '/likelist': { path: '/api/song/like/get', data: (q) => ({ uid: num(q, 'uid', 0) }) },
+  '/likelist': { path: EP[10], data: (q) => ({ uid: num(q, 'uid', 0) }) },
   '/playlist/tracks/add': {
-    path: '/api/playlist/tracks/add',
+    path: EP[11],
     data: (q) => ({ pid: str(q, 'pid'), ids: idsAsJson(str(q, 'ids', '[]')), op: 'add' }),
   },
   '/user/playlist': {
-    path: '/api/user/playlist',
+    path: EP[12],
     data: (q) => ({ uid: num(q, 'uid', 0), limit: num(q, 'limit', 30), offset: num(q, 'offset', 0), includeVideo: true }),
   },
   '/playlist/detail': {
-    path: '/api/v6/playlist/detail',
+    path: EP[13],
     data: (q) => ({ id: num(q, 'id', 0), n: 100000, s: 8 }),
   },
   '/playlist/track/all': {
-    path: '/api/v6/playlist/detail',
+    path: EP[13],
     data: (q) => ({ id: num(q, 'id', 0), n: 100000, s: 8 }),
     wrap: async (body, q) => {
       const trackIds: number[] = body?.playlist?.trackIds?.map((t: any) => Number(t?.id ?? t)) || [];
@@ -212,7 +213,7 @@ const ENDPOINT_MAP: Record<string, EndpointSpec> = {
       const sliced = limit > 0 ? trackIds.slice(offset, offset + limit) : trackIds;
       if (sliced.length) {
         try {
-          const detail = await officialRequest('/api/v3/song/detail', { c: '[' + sliced.map(id => `{"id":${id}}`).join(',') + ']' });
+          const detail = await officialRequest(EP[14], { c: '[' + sliced.map(id => `{"id":${id}}`).join(',') + ']' });
           return {
             code: 200,
             songs: detail.body?.songs || [],
@@ -224,82 +225,82 @@ const ENDPOINT_MAP: Record<string, EndpointSpec> = {
     },
   },
   '/playlist/tracks': {
-    path: '/api/playlist/manipulate/tracks',
+    path: EP[15],
     data: (q) => ({ op: str(q, 'op'), pid: num(q, 'pid', 0), trackIds: idsAsJson(str(q, 'tracks')), imme: true }),
   },
-  '/album': { path: (q) => `/api/v1/album/${num(q, 'id', 0)}`, data: () => ({}) },
+  '/album': { path: (q) => `${EP[40]}${num(q, 'id', 0)}`, data: () => ({}) },
   '/song/detail': {
-    path: '/api/v3/song/detail',
+    path: EP[14],
     data: (q) => ({ c: detailIdsAsJson(str(q, 'ids')) }),
   },
   '/album/sublist': {
-    path: '/api/album/sublist',
+    path: EP[16],
     data: (q) => ({ limit: num(q, 'limit', 25), offset: num(q, 'offset', 0), total: true }),
   },
-  '/artist/detail': { path: '/api/artist/head/info/get', data: (q) => ({ id: num(q, 'id', 0) }) },
+  '/artist/detail': { path: EP[17], data: (q) => ({ id: num(q, 'id', 0) }) },
   '/artist/album': {
-    path: (q) => `/api/artist/albums/${num(q, 'id', 0)}`,
+    path: (q) => `${EP[41]}${num(q, 'id', 0)}`,
     data: (q) => ({ limit: num(q, 'limit', 30), offset: num(q, 'offset', 0), total: true }),
   },
-  '/artist/top/song': { path: '/api/artist/top/song', data: (q) => ({ id: num(q, 'id', 0) }) },
+  '/artist/top/song': { path: EP[18], data: (q) => ({ id: num(q, 'id', 0) }) },
   '/artist/songs': {
-    path: '/api/v1/artist/songs',
+    path: EP[19],
     data: (q) => ({ id: num(q, 'id', 0), order: str(q, 'order', 'hot'), offset: num(q, 'offset', 0), limit: num(q, 'limit', 50), private_cloud: 'true', work_type: 1 }),
   },
   '/song/url/v1': {
-    path: '/api/song/enhance/player/url/v1',
+    path: EP[20],
     data: (q) => ({ ids: idsAsJson(str(q, 'id')), level: str(q, 'level', 'exhigh'), encodeType: 'flac' }),
   },
   '/lyric/new': {
-    path: '/api/song/lyric/v1',
+    path: EP[21],
     data: (q) => ({ id: num(q, 'id', 0), cp: false, tv: 0, lv: 0, rv: 0, kv: 0, yv: 0, ytv: 0, yrv: 0 }),
   },
-  '/song/chorus': { path: '/api/song/chorus', data: (q) => ({ id: num(q, 'id', 0) }) },
-  '/cloud/lyric/get': { path: '/api/cloud/lyric/get', data: (q) => ({ uid: num(q, 'uid', 0), sid: num(q, 'sid', 0) }) },
+  '/song/chorus': { path: EP[22], data: (q) => ({ id: num(q, 'id', 0) }) },
+  '/cloud/lyric/get': { path: EP[23], data: (q) => ({ uid: num(q, 'uid', 0), sid: num(q, 'sid', 0) }) },
   '/user/cloud': {
-    path: '/api/v1/cloud/get',
+    path: EP[24],
     data: (q) => ({ limit: num(q, 'limit', 200), offset: num(q, 'offset', 0) }),
   },
   '/user/cloud/detail': {
-    path: '/api/v1/cloud/get/byids',
+    path: EP[25],
     data: (q) => ({ songIds: idsAsJson(str(q, 'id')) }),
   },
   '/cloudsearch': {
-    path: '/api/cloudsearch/pc',
+    path: EP[26],
     data: (q) => ({ s: str(q, 'keywords'), type: 1, limit: num(q, 'limit', 30), offset: num(q, 'offset', 0), total: true }),
   },
-  '/personal_fm': { path: '/api/v1/radio/get', data: () => ({}) },
-  '/recommend/songs': { path: '/api/v3/discovery/recommend/songs', data: () => ({}) },
+  '/personal_fm': { path: EP[27], data: () => ({}) },
+  '/recommend/songs': { path: EP[28], data: () => ({}) },
   '/recommend/songs/dislike': {
-    path: '/api/v2/discovery/recommend/dislike',
+    path: EP[29],
     data: (q) => ({ resId: num(q, 'id', 0), resType: 4, sceneType: 0 }),
   },
-  '/history/recommend/songs': { path: '/api/discovery/recommend/songs/history/recent', data: () => ({}) },
+  '/history/recommend/songs': { path: EP[30], data: () => ({}) },
   '/history/recommend/songs/detail': {
-    path: '/api/discovery/recommend/songs/history/detail',
+    path: EP[31],
     data: (q) => ({ date: str(q, 'date') }),
   },
   '/personalized': {
-    path: '/api/personalized/playlist',
+    path: EP[32],
     data: (q) => ({ limit: num(q, 'limit', 35), total: true, n: 1000 }),
   },
   '/fm_trash': {
-    path: '/api/radio/trash/add',
+    path: EP[33],
     data: (q) => ({ songId: num(q, 'id', 0), alg: 'RT', time: 3 }),
   },
   '/playlist/subscribe': {
-    path: (q) => str(q, 't') === '1' ? '/api/playlist/subscribe' : '/api/playlist/unsubscribe',
+    path: (q) => str(q, 't') === '1' ? EP[34] : EP[35],
     data: (q) => ({ id: num(q, 'id', 0) }),
   },
   '/album/sub': {
-    path: (q) => str(q, 't') === '1' ? '/api/album/sub' : '/api/album/unsub',
+    path: (q) => str(q, 't') === '1' ? EP[36] : EP[37],
     data: (q) => ({ id: num(q, 'id', 0) }),
   },
   '/playlist/detail/dynamic': {
-    path: '/api/playlist/detail/dynamic',
+    path: EP[38],
     data: (q) => ({ id: num(q, 'id', 0), n: 100000, s: 8 }),
   },
-  '/album/detail/dynamic': { path: '/api/album/detail/dynamic', data: (q) => ({ id: num(q, 'id', 0) }) },
+  '/album/detail/dynamic': { path: EP[39], data: (q) => ({ id: num(q, 'id', 0) }) },
   // 官方无对应简单接口：显式返回不支持，让上层替换逻辑走详情兜底，不误标「已下架」。
   '/song/copyright/rcmd': { path: '', local: async () => ({ code: 404, message: 'unsupported' }) },
   // 旧逻辑用于公共实例注册匿名 cookie，官方直连不需要。

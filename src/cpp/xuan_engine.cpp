@@ -9,9 +9,9 @@
  *           滤波节点，也不调用系统均衡器。
  *   - 渲染：正在播放页的频谱柱 / 波形 / 光晕 / 粒子逐像素写入 RGBA 帧缓冲，
  *           由前端 Canvas.putImageData 呈现；像素由本 C++ 生成。
- *   - 音效关闭 = 完全直通（bit-transparent），不施加任何隐藏低音 / EQ / 压缩，
- *           保持原始响度；音效开启时只叠加「用户所选的一层预设」，
- *           不再额外常驻一层超重低音，避免选超重低音时双层叠加导致浑浊。
+ *   - 音效设计：底层常驻一层「超重低音」隐藏层（UI 不显示、音效开关与否都生效）；
+ *           音效开启后再叠加用户所选预设——选「超重低音」即在隐藏层之上再叠一层，
+ *           选其他预设则叠加在隐藏超重低音之上。
  *
  * 零依赖：不 link libm / libc，所有数学函数自包含实现，编译产物不含任何
  * WASM import（用 `wasm-objdump -x` 可验证），因此任意 WebView / Electron
@@ -188,23 +188,31 @@ extern "C" {
     i32 xe_frame_w()   { return FRAME_W; }
     i32 xe_frame_h()   { return FRAME_H; }
 
-    /* enabled=0：完全直通；enabled=1：只叠加用户所选的一层预设 */
+    /* enabled=0：只有常驻隐藏超重低音；enabled=1：在隐藏层上再叠加用户预设
+     * （选超重低音 = 隐藏层 + 第二层超重低音；选其他预设 = 隐藏层 + 该预设） */
     void xe_set_state(i32 enabled, i32 presetId) {
         if (presetId < 0 || presetId > 7) presetId = 0;
         f32 btB = 0, btT = 0, eq[NBQ];
         for (int i = 0; i < NBQ; i++) eq[i] = 0;
 
-        f32 thr = -18, ratio = 3, atk = 0.008f, rel = 0.15f, se = 0, wet = 0;
-        int drcOn = 1;
-        g_enabled = enabled && presetId != 0;
-        if (g_enabled) {
-            /* 只叠加用户所选的一层预设，不再常驻隐藏超重低音 */
-            const Preset &p = PRESETS[presetId];
-            btB = p.btB; btT = p.btT;
-            for (int i = 0; i < NBQ; i++) eq[i] = p.eq[i];
-            thr = p.thr; ratio = p.ratio; atk = p.atk; rel = p.rel;
-            se = p.se; wet = p.wet; drcOn = p.drcOn;
-        }
+        /* ① 常驻隐藏超重低音（满份，与「开启音效·超重低音」预设等值）—— UI 不显示、始终生效。
+     *   音效关闭时即为这一层；开启音效并选择「超重低音」会在其上再叠一层（两层超重低音）。 */
+    btB += 6; btT += -6;
+    for (int i = 0; i < NBQ; i++) eq[i] += SUPER_BASS[i];
+
+    f32 thr = -18, ratio = 3, atk = 0.008f, rel = 0.15f, se = 0, wet = 0;
+    int drcOn = 1;
+    g_enabled = 1; /* 隐藏层始终生效，处理链不做直通旁路 */
+    if (enabled && presetId != 0) {
+        /* ② 开启音效：在隐藏超重低音基础上叠加用户所选预设。
+         *    选「超重低音」(预设1) 即再叠一层 SUPER_BASS（两层超重低音）；
+         *    选其他预设则在该隐藏层上叠加对应曲线。 */
+        const Preset &p = PRESETS[presetId];
+        btB += p.btB; btT += p.btT;
+        for (int i = 0; i < NBQ; i++) eq[i] += p.eq[i];
+        thr = p.thr; ratio = p.ratio; atk = p.atk; rel = p.rel;
+        se = p.se; wet = p.wet; drcOn = p.drcOn;
+    }
 
         /* 温和前置增益：只对最大正增益做部分补偿，避免整体被压得过小
          * （旧实现按全量补偿 + 额外 -1dB，导致要开到最大音量才听得清）。
@@ -260,8 +268,6 @@ extern "C" {
     /* 对 g_pcmL/g_pcmR 就地处理 n 帧（C++ 完成整条 DSP 链） */
     void xe_process(i32 n) {
         if (n > MAX_FRAMES) n = MAX_FRAMES;
-        /* 音效关闭：完全直通，不施加任何处理，保持原始音色与响度 */
-        if (!g_enabled) return;
         for (int i = 0; i < n; i++) {
             f32 L = g_pcmL[i] * g_preamp;
             f32 R = g_pcmR[i] * g_preamp;

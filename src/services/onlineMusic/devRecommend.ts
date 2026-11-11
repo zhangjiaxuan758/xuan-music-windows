@@ -31,7 +31,7 @@ export const DEV_RECOMMENDED_SONGS: DevRecommendedSongMeta[] = [
     { id: 2727001775, name: '青衣 (DJ版)', artist: '尘ah.' },
 ];
 
-// 官方 /api/v3/song/detail 不可用时的兜底：仍能让列表可见，点击播放时按 ID 重新取链。
+// 官方歌曲详情接口不可用时的兜底：仍能让列表可见，点击播放时按 ID 重新取链。
 const fallbackSong = (meta: DevRecommendedSongMeta): SongResult => ({
     id: meta.id,
     name: meta.name,

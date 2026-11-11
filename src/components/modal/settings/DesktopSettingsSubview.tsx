@@ -10,6 +10,7 @@ import {
     EyeOff,
     Globe,
     KeyRound,
+    Keyboard,
     Loader2,
     Minimize2,
     Monitor,
@@ -639,6 +640,44 @@ const DesktopSettingsSubview: React.FC<DesktopSettingsSubviewProps> = ({
                                 <span>{t('options.save') || 'Save'}</span>
                             )}
                         </button>
+                    </div>
+                </div>
+            </section>
+
+            <section className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2 opacity-60" style={{ color: 'var(--text-secondary)' }}>
+                    <Keyboard size={14} className="opacity-70" /> 键盘快捷键
+                </h3>
+                <div className={`border rounded-2xl overflow-hidden ${borderColor} ${settingsCardClass}`}>
+                    <div className={`p-4 bg-black/[0.04] dark:bg-white/[0.02] border-b ${borderColor}`}>
+                        <p className="text-xs opacity-60 leading-relaxed text-left" style={{ color: 'var(--text-secondary)' }}>
+                            桌面端内置以下键盘快捷键，输入框内可直接复制粘贴；安卓端无键盘，不受影响。
+                        </p>
+                    </div>
+                    <div className="divide-y" style={{ borderColor }}>
+                        {[
+                            { label: '复制 / 剪切 / 粘贴', keys: ['Ctrl+C', 'Ctrl+X', 'Ctrl+V'] },
+                            { label: '撤销 / 重做', keys: ['Ctrl+Z', 'Ctrl+Shift+Z'] },
+                            { label: '全选', keys: ['Ctrl+A'] },
+                            { label: '放大 / 缩小 / 重置缩放', keys: ['Ctrl+=', 'Ctrl+-', 'Ctrl+0'] },
+                            { label: '切换全屏', keys: ['F11'] },
+                            { label: '最小化 / 关闭窗口', keys: ['Ctrl+M', 'Ctrl+W'] },
+                        ].map((row) => (
+                            <div key={row.label} className="flex items-center justify-between p-4 gap-4">
+                                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{row.label}</span>
+                                <span className="flex items-center gap-1.5 shrink-0">
+                                    {row.keys.map((k) => (
+                                        <kbd
+                                            key={k}
+                                            className="px-2 py-0.5 rounded-md border text-[10px] font-mono leading-none"
+                                            style={{ color: 'var(--text-secondary)', borderColor: 'var(--border-secondary, rgba(128,128,128,0.3))' }}
+                                        >
+                                            {k}
+                                        </kbd>
+                                    ))}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
