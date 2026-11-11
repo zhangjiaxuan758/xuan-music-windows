@@ -24,8 +24,8 @@ android {
         applicationId "com.music.xuan"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10632
-        versionName "1.7.2"
+        versionCode 10633
+        versionName "1.7.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // 供 appUpdater.ts 在编译期读取，判断是否有新版本
         buildConfigField "int", "XUAN_VERSION_CODE", "10629"

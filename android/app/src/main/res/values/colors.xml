@@ -3,4 +3,6 @@
     <color name="colorPrimary">#1E3A5F</color>
     <color name="colorPrimaryDark">#0F2038</color>
     <color name="colorAccent">#3D8BFF</color>
+    <!-- 应用统一窗口背景：启动阶段 / WebView 渲染前显示此色，避免部分机型黑屏或白屏闪烁 -->
+    <color name="xuan_window_bg">#09090b</color>
 </resources>

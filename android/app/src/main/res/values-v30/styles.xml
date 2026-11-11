@@ -2,7 +2,8 @@
 <resources>
     <!-- API 30+：ALWAYS 让内容铺满任意一边的摄像头挖孔区域（横屏必需）。 -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <item name="android:background">@color/xuan_window_bg</item>
+        <item name="android:windowBackground">@color/xuan_window_bg</item>
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
     </style>
 </resources>

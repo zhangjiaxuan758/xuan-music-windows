@@ -1,12 +1,13 @@
 // 小轩音乐 · 帧率控制（仅 Android 客户端）
 // --------------------------------------------------------------------
-// 默认使用设备最高刷新率；设置里可切换 30/60/…/设备最高（不支持的档不显示，最低 30）。
+// 默认使用设备最高刷新率（无上限：165/180/240… 均跟随设备）；设置里可切换
+// 30/60/…/设备任意支持档（不支持的档不显示，最低 30）。
 // 原生端通过 preferredDisplayModeId 选择同分辨率下最接近目标帧率的显示模式。
 import { Capacitor, registerPlugin } from '@capacitor/core';
 
 export const FRAME_RATE_STORAGE_KEY = 'xuan_frame_rate';
-// 0 = 自动（设备最高帧率）
-export type FrameRatePref = 0 | 30 | 60 | 90 | 120 | 144 | 165;
+// 0 = 自动（设备最高帧率，无上限）；≥30 = 手动指定任意设备支持档
+export type FrameRatePref = number;
 
 interface XuanNativeFrameRate {
   getSupportedFrameRates(): Promise<{ rates: number[] }>;
@@ -28,7 +29,8 @@ const native = (): XuanNativeFrameRate | null => {
 export const readFrameRatePref = (): FrameRatePref => {
   try {
     const v = Number(localStorage.getItem(FRAME_RATE_STORAGE_KEY) ?? '0');
-    return ([0, 30, 60, 90, 120, 144, 165] as number[]).includes(v) ? (v as FrameRatePref) : 0;
+    // 无上限：任意 ≥30 的设备档位均可保存（165/180/240…），0 = 自动最高
+    return (Number.isFinite(v) && (v === 0 || v >= 30)) ? v : 0;
   } catch { return 0; }
 };
 

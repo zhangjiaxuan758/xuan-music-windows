@@ -1,5 +1,6 @@
 import ncaeRaw from './ncaePresets.json';
 import { getXuanCppEngine, XUAN_CPP_PRESET_INDEX, type XuanCppEngine } from './wasm/xuanEngine';
+import { XUAN_ENGINE_WASM_BASE64 } from './wasm/xuanEngineWasm';
 
 /**
  * 小轩音乐 · 音效引擎（C++ / WebAssembly 版）
@@ -191,18 +192,26 @@ export const writeXuanCustomEq = (_bands: number[] | null): void => {
 // ---------------------------------------------------------------- C++ 引擎状态
 let cppEngine: XuanCppEngine | null = null;
 let cppSampleRate = 44100;
+let engineSampleRate = 0;
 let appliedPreset: XuanEffectPreset = 'off';
 let activeContext: AudioContext | null = null;
 let seekDuckNode: GainNode | null = null;
+let workletNode: AudioWorkletNode | null = null;
+
+/** 把当前设置推给 C++ 引擎；worklet 存在时同时转发到音频线程实例。 */
+const forwardState = (enabled: boolean, presetIndex: number): void => {
+    if (cppEngine) cppEngine.setState(enabled, presetIndex);
+    if (workletNode) {
+        try { workletNode.port.postMessage({ type: 'state', enabled, presetIndex }); } catch { /* noop */ }
+    }
+};
 
 /** 把当前设置推送给 C++ 引擎。音效关闭时 C++ 仍保留常驻隐藏超重低音层。 */
 const applySettings = (settings?: XuanAudioEffectSettings): void => {
     const s = settings || readXuanAudioEffects();
     const presetId: XuanEffectPreset = s.enabled && s.preset !== 'off' ? s.preset : 'off';
     appliedPreset = presetId;
-    if (cppEngine) {
-        cppEngine.setState(s.enabled && s.preset !== 'off', XUAN_CPP_PRESET_INDEX[presetId] ?? 0);
-    }
+    forwardState(s.enabled && s.preset !== 'off', XUAN_CPP_PRESET_INDEX[presetId] ?? 0);
     if (activeContext && activeContext.state === 'suspended') {
         void activeContext.resume().catch(() => { });
     }
@@ -215,6 +224,7 @@ export const initSystemEqualizer = async (): Promise<boolean> => {
     if (!engine) return false;
     cppEngine = engine;
     engine.init(cppSampleRate);
+    engineSampleRate = cppSampleRate;
     applySettings();
     return true;
 };
@@ -226,6 +236,7 @@ export const pushSystemEqualizer = (settings?: XuanAudioEffectSettings): void =>
             if (!engine) return;
             cppEngine = engine;
             engine.init(cppSampleRate);
+            engineSampleRate = cppSampleRate;
             applySettings(settings);
         });
         return;
@@ -241,13 +252,95 @@ if (typeof window !== 'undefined') {
 }
 
 /**
+ * AudioWorklet 泵源码（音频线程运行，独立 WASM 实例）。
+ * DSP 全部在音频回调里完成，主线程卡顿（GC / 渲染 / 解码）不再造成缺帧爆音。
+ * 通过 Blob URL 加载，无需额外静态文件，两端（Android WebView / Electron）行为一致。
+ */
+const WORKLET_SRC = `
+class XuanPump extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.ex = null;
+    this.pcmL = null;
+    this.pcmR = null;
+    this.pendingState = null;
+    this.port.onmessage = (e) => {
+      const d = e.data || {};
+      if (d.type === 'wasm') {
+        WebAssembly.instantiate(d.bytes, {}).then((r) => {
+          const ex = r.instance && r.instance.exports;
+          if (!ex || !ex.xe_process) return;
+          this.ex = ex;
+          this.pcmL = new Float32Array(ex.memory.buffer, ex.xe_pcm_l_ptr(), 2048);
+          this.pcmR = new Float32Array(ex.memory.buffer, ex.xe_pcm_r_ptr(), 2048);
+          ex.xe_init(sampleRate || 44100);
+          if (this.pendingState) {
+            ex.xe_set_state(this.pendingState.enabled ? 1 : 0, this.pendingState.presetIndex);
+            this.pendingState = null;
+          }
+          this.port.postMessage({ type: 'ready' });
+        }).catch(() => { this.ex = null; });
+      } else if (d.type === 'state') {
+        if (this.ex) this.ex.xe_set_state(d.enabled ? 1 : 0, d.presetIndex);
+        else this.pendingState = { enabled: d.enabled, presetIndex: d.presetIndex };
+      }
+    };
+  }
+  process(inputs, outputs) {
+    const output = outputs[0];
+    if (!output || !output.length) return true;
+    const outL = output[0];
+    const outR = output.length > 1 ? output[1] : outL;
+    const input = inputs[0];
+    const ex = this.ex;
+    if (!ex || !input || !input.length || !input[0]) {
+      outL.fill(0);
+      if (outR !== outL) outR.fill(0);
+      return true;
+    }
+    const inL = input[0];
+    const inR = input.length > 1 && input[1] ? input[1] : inL;
+    const n = Math.min(inL.length, 2048);
+    this.pcmL.set(inL.subarray(0, n));
+    this.pcmR.set(inR.subarray(0, n));
+    ex.xe_process(n);
+    outL.set(this.pcmL.subarray(0, n));
+    if (outR !== outL) outR.set(this.pcmR.subarray(0, n));
+    return true;
+  }
+}
+registerProcessor('xuan-pump', XuanPump);
+`;
+
+let workletUrl: string | null = null;
+let wasmBytesCache: Uint8Array | null = null;
+const getWorkletUrl = (): string => {
+    if (!workletUrl) {
+        workletUrl = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
+    }
+    return workletUrl;
+};
+const getWasmBytes = (): Uint8Array | null => {
+    if (!wasmBytesCache) {
+        try {
+            const bin = atob(XUAN_ENGINE_WASM_BASE64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            wasmBytesCache = bytes;
+        } catch { return null; }
+    }
+    return wasmBytesCache;
+};
+
+/**
  * 把 C++ 音效引擎插入音频链，返回应连接到 source 的输入节点。
- * 用 ScriptProcessorNode 逐帧把 PCM 送进 WASM，DSP 全部在 C++ 完成。
- * 引擎未就绪时 bit-transparent 直通，绝不影响播放。
+ * 优先 AudioWorklet（音频线程 DSP，主线程卡顿不影响播放，彻底消除杂音）；
+ * 不支持时回退 ScriptProcessorNode。引擎未就绪阶段 bit-transparent 直通。
  */
 export const attachXuanAudioEffects = (ctx: AudioContext, downstream: AudioNode): AudioNode => {
     activeContext = ctx;
     cppSampleRate = ctx.sampleRate || 44100;
+    workletNode = null;
 
     const input = ctx.createGain();
     input.gain.value = 1;
@@ -265,16 +358,20 @@ export const attachXuanAudioEffects = (ctx: AudioContext, downstream: AudioNode)
     input.connect(processor);
     processor.connect(downstream);
 
-    // 引擎异步加载：就绪后按真实采样率 init 并应用当前设置。
+    // 主线程引擎：仅供播放器页渲染（visualizer）使用；按真实采样率补 init。
     if (!cppEngine) {
         void getXuanCppEngine().then(engine => {
             if (!engine) return;
             cppEngine = engine;
-            engine.init(cppSampleRate);
+            if (engineSampleRate !== cppSampleRate) {
+                engine.init(cppSampleRate);
+                engineSampleRate = cppSampleRate;
+            }
             applySettings();
         });
-    } else {
+    } else if (engineSampleRate !== cppSampleRate) {
         cppEngine.init(cppSampleRate);
+        engineSampleRate = cppSampleRate;
         applySettings();
     }
 
@@ -301,6 +398,43 @@ export const attachXuanAudioEffects = (ctx: AudioContext, downstream: AudioNode)
         outL.set(eng.pcmL.subarray(0, n));
         if (outR !== outL) outR.set(eng.pcmR.subarray(0, n));
     };
+
+    // 升级到 AudioWorklet：wasm 实例化完成后（ready）再换线，避免静音间隙。
+    void (async () => {
+        try {
+            if (!ctx.audioWorklet) return;
+            const bytes = getWasmBytes();
+            if (!bytes) return;
+            await ctx.audioWorklet.addModule(getWorkletUrl());
+            const node = new AudioWorkletNode(ctx, 'xuan-pump', {
+                numberOfInputs: 1,
+                numberOfOutputs: 1,
+                outputChannelCount: [2],
+            });
+            node.port.onmessage = (e: MessageEvent) => {
+                if ((e.data as { type?: string })?.type !== 'ready') return;
+                if (workletNode !== node) return;
+                try {
+                    input.disconnect(processor);
+                    processor!.onaudioprocess = null;
+                    processor!.disconnect();
+                } catch { /* noop */ }
+                input.connect(node);
+                node.connect(downstream);
+            };
+            node.port.postMessage({ type: 'wasm', bytes });
+            const s = readXuanAudioEffects();
+            const on = s.enabled && s.preset !== 'off';
+            node.port.postMessage({
+                type: 'state',
+                enabled: on,
+                presetIndex: XUAN_CPP_PRESET_INDEX[on ? s.preset : 'off'] ?? 0,
+            });
+            workletNode = node;
+        } catch (err) {
+            console.warn('[XuanAudio] AudioWorklet 不可用，保持 ScriptProcessor 兜底', err);
+        }
+    })();
 
     return input;
 };

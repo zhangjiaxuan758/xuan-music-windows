@@ -24,6 +24,20 @@ body {
   overflow: hidden;
 }
 
+/* 全局禁止文本选择与长按复制（所有页面统一生效）；输入框保留正常输入选择 */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input,
+textarea,
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
 :root {
   --scrollbar-track: #18181b;
   --scrollbar-thumb: #3f3f46;

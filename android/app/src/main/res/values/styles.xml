@@ -13,10 +13,14 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- 统一窗口背景：WebView 渲染完成前不再是黑屏/白屏 -->
+        <item name="android:windowBackground">@color/xuan_window_bg</item>
     </style>
 
 
+    <!-- 启动主题：去掉启动图片，改用与应用一致的纯色背景（无启动动画、无黑屏闪烁） -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <item name="android:background">@color/xuan_window_bg</item>
+        <item name="android:windowBackground">@color/xuan_window_bg</item>
     </style>
 </resources>
