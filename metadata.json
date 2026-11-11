@@ -1,5 +1,5 @@
 {
-  "name": "Xuan",
-  "description": "A local music player that syncs with Netease Cloud Music lyrics, featuring AI-powered visual themes and kinetic typography effects.",
+  "name": "小轩音乐",
+  "description": "小轩音乐 · 横屏全屏 Android 音乐播放器，直连网易云音乐，支持动态歌词与可视化主题。",
   "requestFramePermissions": []
 }

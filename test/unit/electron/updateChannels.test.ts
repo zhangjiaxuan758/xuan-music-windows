@@ -14,7 +14,7 @@ const {
             updateEnabled: boolean;
             rollingReleaseTag: string | null;
         },
-        github: { owner: string; repo: string },
+        repository: { owner: string; repo: string },
     ) => Record<string, unknown> | null;
     resolveReleaseChannel: (version: string, declaredChannel?: string | null) => {
         id: string;
@@ -35,46 +35,46 @@ describe('release update channels', () => {
     });
 
     it.each([
-        ['0.7.0', 'realeco', 'latest', false],
-        ['0.7.0-beta.123', 'limo', 'beta', true],
-        ['0.7.0-alpha.123', 'cielo', 'alpha', true],
+        ['0.7.0', 'stable', 'latest', false],
+        ['0.7.0-beta.123', 'preview', 'beta', true],
+        ['0.7.0-alpha.123', 'canary', 'alpha', true],
     ])('maps %s to the %s lane', (version, id, updaterChannel, allowPrerelease) => {
         expect(resolveReleaseChannel(version)).toMatchObject({ id, updaterChannel, allowPrerelease });
     });
 
     it('opens rolling prereleases instead of manufacturing a semver tag', () => {
-        const releasesUrl = 'https://github.com/chthollyphile/xuan-major/releases';
+        const releasesUrl = 'https://music.jrr.lol/download';
 
-        expect(getReleaseUrl('limo', '0.7.0-beta.123', releasesUrl)).toBe(`${releasesUrl}/tag/limo`);
-        expect(getReleaseUrl('cielo', '0.7.0-alpha.123', releasesUrl)).toBe(`${releasesUrl}/tag/cielo`);
-        expect(getReleaseUrl('realeco', '0.7.0', releasesUrl)).toBe(`${releasesUrl}/tag/v0.7.0`);
+        expect(getReleaseUrl('preview', '0.7.0-beta.123', releasesUrl)).toBe(`${releasesUrl}/tag/preview`);
+        expect(getReleaseUrl('canary', '0.7.0-alpha.123', releasesUrl)).toBe(`${releasesUrl}/tag/canary`);
+        expect(getReleaseUrl('stable', '0.7.0', releasesUrl)).toBe(`${releasesUrl}/tag/v0.7.0`);
     });
 
-    it('reads rolling prerelease metadata directly instead of using the GitHub release feed', () => {
-        const github = { owner: 'chthollyphile', repo: 'xuan-major' };
+    it('reads rolling prerelease metadata directly from the official server', () => {
+        const repository = { owner: 'xuan', repo: 'music' };
 
-        expect(getUpdateProviderConfig(resolveReleaseChannel('0.7.0-beta.123', 'limo'), github)).toEqual({
+        expect(getUpdateProviderConfig(resolveReleaseChannel('0.7.0-beta.123', 'preview'), repository)).toEqual({
             provider: 'generic',
-            url: 'https://github.com/chthollyphile/xuan-major/releases/download/limo/',
+            url: 'https://music.jrr.lol/download/',
             channel: 'beta',
             useMultipleRangeRequest: false,
         });
-        expect(getUpdateProviderConfig(resolveReleaseChannel('0.7.0-alpha.123', 'cielo'), github)).toEqual({
+        expect(getUpdateProviderConfig(resolveReleaseChannel('0.7.0-alpha.123', 'canary'), repository)).toEqual({
             provider: 'generic',
-            url: 'https://github.com/chthollyphile/xuan-major/releases/download/cielo/',
+            url: 'https://music.jrr.lol/download/',
             channel: 'alpha',
             useMultipleRangeRequest: false,
         });
     });
 
-    it('restores the GitHub provider after switching back to Realeco', () => {
+    it('uses the official provider after switching back to stable', () => {
         expect(getUpdateProviderConfig(
-            resolveReleaseChannel('0.7.0', 'realeco'),
-            { owner: 'chthollyphile', repo: 'xuan-major' },
+            resolveReleaseChannel('0.7.0', 'stable'),
+            { owner: 'xuan', repo: 'music' },
         )).toEqual({
-            provider: 'github',
-            owner: 'chthollyphile',
-            repo: 'xuan-major',
+            provider: 'generic',
+            owner: 'xuan',
+            repo: 'music',
             channel: 'latest',
         });
     });

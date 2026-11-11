@@ -168,7 +168,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
-      const res = await fetch(`https://namoe.izuna.top/api/namoe?hash=${commitHash}`, {
+      const res = await fetch(`https://music.jrr.lol/api/commit-name?hash=${commitHash}`, {
         signal: controller.signal
       });
       clearTimeout(timeout);
@@ -187,8 +187,8 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     throw new Error(`Could not resolve the commit name for ${commitHash}`);
   }
 
-  const appVersionLabel = process.env.APP_VERSION_LABEL?.trim() || 'Realeco';
-  const appReleaseChannel = process.env.APP_RELEASE_CHANNEL?.trim().toLowerCase() || 'realeco';
+  const appVersionLabel = process.env.APP_VERSION_LABEL?.trim() || '小轩音乐';
+  const appReleaseChannel = process.env.APP_RELEASE_CHANNEL?.trim().toLowerCase() || 'stable';
   const dockerStackVersion = process.env.DOCKER_STACK_VERSION?.trim() || '';
 
   // 客户端在线更新依赖真实 versionCode：直接以 android/app/build.gradle 为唯一来源注入，

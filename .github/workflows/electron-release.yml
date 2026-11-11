@@ -1,10 +1,10 @@
-name: Publish Realeco
+name: Publish Xuan Music
 
 on:
   push:
     branches: [main]
     paths:
-      - realeco-release
+      - release
   workflow_dispatch:
     inputs:
       publish_aur_only:
@@ -17,12 +17,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: realeco-release
+  group: release
   cancel-in-progress: false
 
 jobs:
   validate-release:
-    name: Validate Realeco release metadata
+    name: Validate Xuan Music release metadata
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.validate.outputs.version }}
@@ -44,10 +44,10 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RELEASE_FILE_VERSION="$(node -e "const version=require('./package.json').version; if (!/^[0-9]+\\.[0-9]+\\.[0-9]+$/.test(version)) throw new Error('package.json version must be a stable A.B.C version for a manual Realeco release.'); process.stdout.write(version);")"
+            RELEASE_FILE_VERSION="$(node -e "const version=require('./package.json').version; if (!/^[0-9]+\\.[0-9]+\\.[0-9]+$/.test(version)) throw new Error('package.json version must be a stable A.B.C version for a manual Xuan Music release.'); process.stdout.write(version);")"
           else
             COMMIT_MESSAGE="$(git log -1 --format=%B)"
-            RELEASE_FILE_VERSION="$(COMMIT_MESSAGE="${COMMIT_MESSAGE}" node -e "const fs=require('fs'); const { validateRealecoReleaseMetadata }=require('./shared/realecoReleaseMetadata.cjs'); process.stdout.write(validateRealecoReleaseMetadata({ commitMessage: process.env.COMMIT_MESSAGE, releaseFileContent: fs.readFileSync('realeco-release', 'utf8'), packageVersion: require('./package.json').version }));")"
+            RELEASE_FILE_VERSION="$(COMMIT_MESSAGE="${COMMIT_MESSAGE}" node -e "const fs=require('fs'); const { validateReleaseMetadata }=require('./shared/releaseMetadata.cjs'); process.stdout.write(validateReleaseMetadata({ commitMessage: process.env.COMMIT_MESSAGE, releaseFileContent: fs.readFileSync('release', 'utf8'), packageVersion: require('./package.json').version }));")"
           fi
 
           RELEASES_FILE="$(mktemp)"
@@ -79,16 +79,16 @@ jobs:
             process.exit(0);
           }
           if (existing && !existing.draft) {
-            throw new Error(`v${target} already exists as a pre-release; Realeco tags must be stable releases.`);
+            throw new Error(`v${target} already exists as a pre-release; stable tags must be stable releases.`);
           }
           if (latest && compareVersions(targetParts, parse(latest.tag_name)) <= 0) {
-            throw new Error(`Realeco version ${target} must be higher than published ${latest.tag_name}.`);
+            throw new Error(`Xuan Music version ${target} must be higher than published ${latest.tag_name}.`);
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${target}\ntag=v${target}\nversion_valid=true\nshould_build=true\n`);
           NODE
 
   prepare-release:
-    name: Prepare Realeco draft
+    name: Prepare Xuan Music draft
     needs: validate-release
     if: needs.validate-release.outputs.should_build == 'true' && github.event.inputs.publish_aur_only != 'true'
     runs-on: ubuntu-latest
@@ -108,7 +108,7 @@ jobs:
           fi
 
   build:
-    name: Build Realeco on ${{ matrix.os }}
+    name: Build Xuan Music on ${{ matrix.os }}
     needs: [validate-release, prepare-release]
     if: needs.validate-release.outputs.should_build == 'true' && github.event.inputs.publish_aur_only != 'true'
     runs-on: ${{ matrix.os }}
@@ -130,12 +130,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Stamp Realeco package metadata
+      - name: Stamp Xuan Music package metadata
         shell: bash
         env:
           TARGET_VERSION: ${{ needs.validate-release.outputs.version }}
         run: |
-          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.xuanReleaseChannel='realeco'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
+          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.xuanReleaseChannel='stable'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
 
       - name: Generate release notes
         shell: bash
@@ -160,8 +160,8 @@ jobs:
       - name: Build web app for Electron
         env:
           ELECTRON: 'true'
-          APP_VERSION_LABEL: Realeco
-          APP_RELEASE_CHANNEL: realeco
+          APP_VERSION_LABEL: Xuan Music
+          APP_RELEASE_CHANNEL: stable
         run: npm run build
 
       - name: Package Electron app
@@ -172,7 +172,7 @@ jobs:
       - name: Upload packaged artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: realeco-${{ matrix.os }}
+          name: stable-${{ matrix.os }}
           path: |
             release/*.dmg
             release/*.zip
@@ -188,7 +188,7 @@ jobs:
           retention-days: 14
 
   publish-release:
-    name: Publish Realeco draft
+    name: Publish Xuan Music draft
     needs: [validate-release, build]
     if: needs.validate-release.outputs.should_build == 'true' && github.event.inputs.publish_aur_only != 'true'
     runs-on: ubuntu-latest
@@ -197,7 +197,7 @@ jobs:
       - name: Download packaged artifacts
         uses: actions/download-artifact@v7
         with:
-          path: realeco-artifacts
+          path: stable-artifacts
 
       - name: Publish GitHub draft release
         env:
@@ -205,13 +205,13 @@ jobs:
           RELEASE_TAG: ${{ needs.validate-release.outputs.tag }}
         shell: bash
         run: |
-          NOTES_FILE=$(find realeco-artifacts -type f -name 'release-notes.md' | head -n 1)
-          mapfile -d '' files < <(find realeco-artifacts -type f ! -name 'release-notes.md' -print0)
+          NOTES_FILE=$(find stable-artifacts -type f -name 'release-notes.md' | head -n 1)
+          mapfile -d '' files < <(find stable-artifacts -type f ! -name 'release-notes.md' -print0)
           if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             gh release upload "${RELEASE_TAG}" "${files[@]}" --repo "${GITHUB_REPOSITORY}" --clobber
-            gh release edit "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "Realeco ${RELEASE_TAG}" --notes-file "${NOTES_FILE}"
+            gh release edit "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --title "Xuan Music ${RELEASE_TAG}" --notes-file "${NOTES_FILE}"
           else
-            gh release create "${RELEASE_TAG}" "${files[@]}" --repo "${GITHUB_REPOSITORY}" --title "Realeco ${RELEASE_TAG}" --notes-file "${NOTES_FILE}" --target "${GITHUB_SHA}" --draft
+            gh release create "${RELEASE_TAG}" "${files[@]}" --repo "${GITHUB_REPOSITORY}" --title "Xuan Music ${RELEASE_TAG}" --notes-file "${NOTES_FILE}" --target "${GITHUB_SHA}" --draft
           fi
 
   publish-aur:
@@ -239,7 +239,7 @@ jobs:
 
       - name: Prepare AUR metadata
         if: steps.aur-secrets.outputs.configured == 'true'
-        run: ./packaging/aur/xuan-major-bin/update.sh "${{ needs.validate-release.outputs.version }}"
+        run: ./packaging/aur/xuan-music-bin/update.sh "${{ needs.validate-release.outputs.version }}"
 
       - name: Set up SSH key
         if: steps.aur-secrets.outputs.configured == 'true'
@@ -263,16 +263,16 @@ jobs:
           RELEASE_VERSION: ${{ needs.validate-release.outputs.version }}
         run: |
           git clone "${AUR_REPO_SSH_URL}" aur-repo
-          cp packaging/aur/xuan-major-bin/PKGBUILD aur-repo/PKGBUILD
-          cp packaging/aur/xuan-major-bin/.SRCINFO aur-repo/.SRCINFO
-          cp packaging/aur/xuan-major-bin/xuan-major.desktop aur-repo/xuan-major.desktop
-          cp packaging/aur/xuan-major-bin/xuan-major.png aur-repo/xuan-major.png
+          cp packaging/aur/xuan-music-bin/PKGBUILD aur-repo/PKGBUILD
+          cp packaging/aur/xuan-music-bin/.SRCINFO aur-repo/.SRCINFO
+          cp packaging/aur/xuan-music-bin/xuan-music.desktop aur-repo/xuan-music.desktop
+          cp packaging/aur/xuan-music-bin/xuan-music.png aur-repo/xuan-music.png
           cd aur-repo
-          if git diff --quiet -- PKGBUILD .SRCINFO xuan-major.desktop xuan-major.png; then
+          if git diff --quiet -- PKGBUILD .SRCINFO xuan-music.desktop xuan-music.png; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add PKGBUILD .SRCINFO xuan-major.desktop xuan-major.png
+          git add PKGBUILD .SRCINFO xuan-music.desktop xuan-music.png
           git commit -m "Update to v${RELEASE_VERSION}"
           git push

@@ -1,10 +1,10 @@
-name: Publish Cielo Canary
+name: Publish Canary
 
 on:
   workflow_dispatch:
     inputs:
       publish_mode:
-        description: 'Choose whether this build updates Cielo, is retained as a branch release, or is available only as workflow artifacts'
+        description: 'Choose whether this build updates Canary, is retained as a branch release, or is available only as workflow artifacts'
         required: true
         default: rolling
         type: choice
@@ -20,12 +20,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: cielo-canary-${{ github.event_name != 'workflow_dispatch' && 'rolling' || inputs.publish_mode == 'rolling' && 'rolling' || format('{0}-{1}', inputs.publish_mode, github.ref_name) }}
+  group: canary-canary-${{ github.event_name != 'workflow_dispatch' && 'rolling' || inputs.publish_mode == 'rolling' && 'rolling' || format('{0}-{1}', inputs.publish_mode, github.ref_name) }}
   cancel-in-progress: false
 
 jobs:
   prepare:
-    name: Prepare Cielo build
+    name: Prepare Canary build
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[canary]')
     outputs:
@@ -39,7 +39,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v6
 
-      - name: Determine Cielo metadata
+      - name: Determine Canary metadata
         id: meta
         shell: bash
         env:
@@ -54,7 +54,7 @@ jobs:
           case "${PUBLISH_MODE}" in
             rolling|branch-release|artifacts) ;;
             *)
-              echo "Unsupported Cielo publish mode: ${PUBLISH_MODE}" >&2
+              echo "Unsupported Canary publish mode: ${PUBLISH_MODE}" >&2
               exit 1
               ;;
           esac
@@ -64,11 +64,11 @@ jobs:
           BRANCH_SLUG="${BRANCH_SLUG:-branch}"
           SHORT_SHA="$(git rev-parse --short=7 HEAD)"
           if [[ "${PUBLISH_MODE}" == "rolling" ]]; then
-            RELEASE_TAG="cielo"
-            RELEASE_TITLE="Cielo Canary (${VERSION})"
+            RELEASE_TAG="canary"
+            RELEASE_TITLE="Canary Canary (${VERSION})"
           else
-            RELEASE_TAG="cielo-${BRANCH_SLUG}-${SHORT_SHA}"
-            RELEASE_TITLE="Cielo Branch Canary (${GITHUB_REF_NAME}, ${VERSION})"
+            RELEASE_TAG="canary-${BRANCH_SLUG}-${SHORT_SHA}"
+            RELEASE_TITLE="Canary Branch Canary (${GITHUB_REF_NAME}, ${VERSION})"
           fi
 
           {
@@ -80,7 +80,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   build:
-    name: Build Cielo on ${{ matrix.os }}
+    name: Build Canary on ${{ matrix.os }}
     needs: prepare
     runs-on: ${{ matrix.os }}
     strategy:
@@ -101,18 +101,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Stamp Cielo package metadata
+      - name: Stamp Canary package metadata
         shell: bash
         env:
           TARGET_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.xuanReleaseChannel='cielo'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
+          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.xuanReleaseChannel='canary'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
 
       - name: Build web app for Electron
         env:
           ELECTRON: 'true'
-          APP_VERSION_LABEL: Cielo
-          APP_RELEASE_CHANNEL: cielo
+          APP_VERSION_LABEL: Canary
+          APP_RELEASE_CHANNEL: canary
         run: npm run build
 
       - name: Package Electron app
@@ -138,7 +138,7 @@ jobs:
           retention-days: 14
 
   publish:
-    name: Publish Cielo prerelease
+    name: Publish Canary prerelease
     runs-on: ubuntu-latest
     needs: [prepare, build]
     if: needs.prepare.outputs.publish_mode != 'artifacts'
@@ -147,9 +147,9 @@ jobs:
       - name: Download packaged artifacts
         uses: actions/download-artifact@v7
         with:
-          path: cielo-artifacts
+          path: canary-artifacts
 
-      - name: Publish Cielo release
+      - name: Publish Canary release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ needs.prepare.outputs.branch_name }}
@@ -161,7 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           gh release delete "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" --cleanup-tag --yes >/dev/null 2>&1 || true
-          mapfile -d '' files < <(find cielo-artifacts -type f -print0)
+          mapfile -d '' files < <(find canary-artifacts -type f -print0)
           COMMIT_URL="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
           PUBLISHED_AT="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           cat > release-notes.md <<EOF

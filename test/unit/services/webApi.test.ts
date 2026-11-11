@@ -6,9 +6,9 @@ import { resolveXuanApiUrl } from '@/services/webApi';
 describe('resolveXuanApiUrl', () => {
   it('normalizes the configured remote base and endpoint', () => {
     expect(resolveXuanApiUrl('/api/lyric-proxy', {
-      apiBase: ' https://xuan.izuna.top/api/ ',
+      apiBase: ' https://music.jrr.lol/api/ ',
       capacitorAndroid: true,
-    })).toBe('https://xuan.izuna.top/api/lyric-proxy');
+    })).toBe('https://music.jrr.lol/api/lyric-proxy');
   });
 
   it('keeps the same-origin Web fallback when no base is configured', () => {

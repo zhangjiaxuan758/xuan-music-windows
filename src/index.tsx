@@ -3,7 +3,11 @@ import { installGlobalVisualizerFrameRateLimiter } from './utils/frameRateLimite
 import { initXuanServer } from './services/xuanServer';
 import { installOfflineImageGuard, precacheStaticAssets } from './services/offlineImageGuard';
 import { initSystemEqualizer } from './services/audioEffects';
+import { initAppUpdater } from './services/appUpdater';
 void initXuanServer();
+// 更新检查在最早时机并行发起：不等待 React 挂载 / 配置拉取 / 音效初始化，
+// 一旦服务端有新版本，弹窗第一时间覆盖呈现。
+void initAppUpdater();
 // @ts-ignore
 globalThis.Buffer = Buffer;
 installGlobalVisualizerFrameRateLimiter();

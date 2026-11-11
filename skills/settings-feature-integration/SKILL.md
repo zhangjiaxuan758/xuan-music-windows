@@ -63,7 +63,7 @@ description: Use when adding, changing, refactoring, or reviewing user-facing se
 - 存储：`src/components/modal/settings/StorageSettingsSection.tsx`
   缓存、同步服务配置、主题/视觉设置同步，以及 zip 导入导出动作。
 - 桌面端：`src/components/modal/settings/DesktopSettingsSubview.tsx`
-  包含更新通道选择（release / limo / cielo）和 Acrylic 背景开启确认弹窗。
+  包含更新通道选择（stable / preview / canary）和 Acrylic 背景开启确认弹窗。
 - 实验室：`src/components/modal/settings/LabSettingsModal.tsx`
   包含固定顶部标题控件与返回按钮。
 - visualizer 专属参数：优先放在模式相邻设置面板，再由 registry 的 `renderSettingsPanel` 挂回

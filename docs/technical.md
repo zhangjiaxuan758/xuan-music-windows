@@ -7,31 +7,31 @@
 
 ## 桌面端说明
 
-桌面版内置前后端运行环境，适合希望即装即用的用户。最新版本请前往 [Releases 页面](https://github.com/chthollyphile/xuan-major/releases)。
+桌面版内置前后端运行环境，适合希望即装即用的用户。最新版本请前往官方网站下载。
 
 ### 发布与更新通道
 
 | 通道 | 面向对象 | 更新来源 | 网盘下载 |
 | --- | --- | --- | --- |
-| Realeco | 正式版 | `latest` | 提供 |
-| Limo | Nightly | `beta`，也可升级到 Realeco | 不提供 |
-| Cielo | Canary | `alpha`，也可升级到 Limo / Realeco | 不提供 |
+| 小轩音乐正式版 | 正式版 | `latest` | 提供 |
+| 小轩音乐预览版 | Nightly | `beta`，也可升级到正式版 | 不提供 |
+| 小轩音乐内测版 | Canary | `alpha`，也可升级到预览版 / 正式版 | 不提供 |
 
-Realeco 发布仅在 `main` 修改根目录 `realeco-release` 时触发。自动触发时，该文件必须只包含单行 `A.B.C`，并且必须同时与 `package.json` 版本、当前完整提交信息 `release: vA.B.C` 严格一致。手动触发作为应急入口，会跳过这两项一致性检查，直接使用当前 HEAD 的 `package.json.version`（仍必须是稳定的 `A.B.C`）打包。工作流创建草稿 Release；维护者在 GitHub 手动公开后，Realeco 客户端才会发现更新。
+正式版发布仅在 `main` 修改根目录 `release` 时触发。自动触发时，该文件必须只包含单行 `A.B.C`，并且必须同时与 `package.json` 版本、当前完整提交信息 `release: vA.B.C` 严格一致。手动触发作为应急入口，会跳过这两项一致性检查，直接使用当前 HEAD 的 `package.json.version`（仍必须是稳定的 `A.B.C`）打包。工作流创建草稿 Release；维护者在 GitHub 手动公开后，正式版客户端才会发现更新。
 
-Cielo 的 `[canary]` 推送会更新滚动的 `cielo` prerelease，供 Cielo 通道客户端获取更新。手动运行 Cielo 工作流时可选择 `branch-release`，为当前分支和提交创建独立的 `cielo-<branch>-<sha>` prerelease，供人工下载和回归；该 Release 不参与客户端自动更新。选择 `artifacts` 则不创建 Release，只将各平台构建产物保留 14 天。
+内测版的 `[canary]` 推送会更新滚动的 `canary` prerelease，供内测版通道客户端获取更新。手动运行内测版工作流时可选择 `branch-release`，为当前分支和提交创建独立的 `canary-<branch>-<sha>` prerelease，供人工下载和回归；该 Release 不参与客户端自动更新。选择 `artifacts` 则不创建 Release，只将各平台构建产物保留 14 天。
 
 ### Linux 获取方式
 
-1. Arch Linux / Manjaro：通过 AUR 安装 `xuan-major-bin`
+1. Arch Linux / Manjaro：通过 AUR 安装 `xuan-music-bin`
 
 ```bash
-yay -S xuan-major-bin
+yay -S xuan-music-bin
 ```
 
 2. Debian / Ubuntu / Linux Mint：下载 `.deb`
 3. Fedora / RHEL / openSUSE：下载 `.rpm`
-4. 其他发行版：下载 `tar.gz`，解压后直接运行 `xuan-major`
+4. 其他发行版：下载 `tar.gz`，解压后直接运行 `xuan-music`
 
 `tar.gz` 包中附带图标与 `.desktop` 模板，可按需手动创建桌面启动项。
 
@@ -49,7 +49,7 @@ windowrule {
   no_blur = on
   border_size = 0
   no_shadow = on
-  match:class = ^(xuan-major)$
+  match:class = ^(xuan-music)$
   match:title = ^(Xuan Remote)$
 }
 
@@ -61,7 +61,7 @@ windowrule {
 
 ### 后端 API
 
-本项目依赖 [NeteaseCloudMusicApiEnhanced](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced) 提供音乐相关后端服务。
+本项目直连网易云音乐官方接口，不依赖第三方公共后端服务。
 
 如果使用前端版本的话，需要先自行部署该 API 服务。
 
@@ -84,7 +84,6 @@ Xuan 提供了从外部与播放器进行交互的 Stage API，从而可以实�
 
 如果你希望快速上线 Web 版本，可以直接通过下方入口创建 Vercel 项目：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/chthollyphile/xuan-major)
 
 部署完成后，请在 Vercel 项目设置中补齐环境变量。
 
@@ -140,7 +139,7 @@ VITE_AI_PROVIDER=google
 GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
-Web 版要使用酷狗时，需要自行部署 [KuGouMusicApi](https://github.com/MakcRe/KuGouMusicApi) 并填写 `VITE_KUGOU_API_BASE`。该变量没有默认公共实例；开发调试时可在 `.env.local` 中临时指向调试服务。Electron 版在主进程中直接调用内置的 KuGouMusicApi Node 模块，不会再启动一个酷狗 HTTP 服务。
+Web 版要使用酷狗时，需要自行部署酷狗音源服务并填写 `VITE_KUGOU_API_BASE`。该变量没有默认公共实例；开发调试时可在 `.env.local` 中临时指向调试服务。Electron 版在主进程中直接调用内置的 KuGouMusicApi Node 模块，不会再启动一个酷狗 HTTP 服务。
 
 Electron 的酷狗登录与账号刷新日志位于 `%APPDATA%\Xuan\logs\kugou-provider.log`。日志只记录请求阶段、状态、字段名和错误摘要，token、Cookie、userid、dfid 会被脱敏。
 
@@ -174,7 +173,7 @@ vercel dev
 
 ## Android（Capacitor 8）
 
-Android 应用位于仓库的 `android/`，内置 `dist/` 中的 Vite 产物；application ID 固定为 `top.izuna.xuanmajor`，最低支持 Android 7 / API 24。Android 构建不会注册 PWA Service Worker，本地音乐入口因为不支持因此也会隐藏。
+Android 应用位于仓库的 `android/`，内置 `dist/` 中的 Vite 产物；application ID 固定为 `com.music.xuan`，最低支持 Android 7 / API 24。Android 构建不会注册 PWA Service Worker，本地音乐入口因为不支持因此也会隐藏。
 
 ### 本地工具链
 

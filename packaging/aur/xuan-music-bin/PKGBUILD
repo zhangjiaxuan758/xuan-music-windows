@@ -1,0 +1,48 @@
+pkgname=xuan-music-bin
+pkgver=0.1.4
+pkgrel=1
+pkgdesc="Lyrics Reimagine desktop app packaged from prebuilt releases"
+arch=('x86_64')
+url="https://music.jrr.lol"
+license=('AGPL')
+depends=(
+  'alsa-lib'
+  'gtk3'
+  'libxss'
+  'nss'
+)
+optdepends=(
+  'xdg-utils: desktop integration helpers'
+)
+provides=('xuan-music')
+conflicts=('xuan-music')
+source=(
+  "https://music.jrr.lol"
+  'xuan-music.desktop'
+  'xuan-music.png'
+)
+sha256sums=(
+  'SKIP'
+  '9dc6f7f25e6dc214cf8798e9df4d01829e2a832899313cc346e97c8db0e4c9ec'
+  'cffe4a4fe5608706e2522de3b4cd8cc174357a9310493f107553794831312054'
+)
+
+package() {
+  local appdir
+
+  appdir="$(dirname "$(find "${srcdir}" -type f -name 'xuan-music' -perm -u+x | head -n1)")"
+  if [[ -z "${appdir}" ]]; then
+    echo "Could not locate packaged xuan-music executable in extracted archive" >&2
+    return 1
+  fi
+
+  install -dm755 "${pkgdir}/opt/xuan-music"
+  cp -a "${appdir}/." "${pkgdir}/opt/xuan-music/"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -sf "/opt/xuan-music/xuan-music" "${pkgdir}/usr/bin/xuan-music"
+
+  install -Dm644 "${srcdir}/xuan-music.desktop" \
+    "${pkgdir}/usr/share/applications/xuan-music.desktop"
+  install -Dm644 "${srcdir}/xuan-music.png" "${pkgdir}/usr/share/pixmaps/xuan-music.png"
+}

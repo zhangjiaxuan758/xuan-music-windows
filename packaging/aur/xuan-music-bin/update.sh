@@ -4,8 +4,8 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pkgbuild="${script_dir}/PKGBUILD"
 srcinfo="${script_dir}/.SRCINFO"
-desktop_file="${script_dir}/xuan-major.desktop"
-icon_file="${script_dir}/xuan-major.png"
+desktop_file="${script_dir}/xuan-music.desktop"
+icon_file="${script_dir}/xuan-music.png"
 
 if [[ $# -ge 1 ]]; then
   version="$1"
@@ -21,11 +21,11 @@ sed -i -E "0,/^[[:space:]]*'[0-9a-f]{64}'$/{s//  '${desktop_sha256}'/}" "${pkgbu
 sed -i -E "0,/^[[:space:]]*'[0-9a-f]{64}'$/{/^[[:space:]]*'${desktop_sha256}'$/!s//  '${icon_sha256}'/}" "${pkgbuild}"
 
 cat > "${srcinfo}" <<EOF
-pkgbase = xuan-major-bin
+pkgbase = xuan-music-bin
 	pkgdesc = Lyrics Reimagine desktop app packaged from prebuilt releases
 	pkgver = ${version}
 	pkgrel = 1
-	url = https://github.com/chthollyphile/xuan-major
+	url = https://music.jrr.lol
 	arch = x86_64
 	license = AGPL
 	depends = alsa-lib
@@ -33,16 +33,16 @@ pkgbase = xuan-major-bin
 	depends = libxss
 	depends = nss
 	optdepends = xdg-utils: desktop integration helpers
-	provides = xuan-major
-	conflicts = xuan-major
-	source = https://github.com/chthollyphile/xuan-major/releases/download/v${version}/xuan-major-${version}-linux-x64.tar.gz
-	source = xuan-major.desktop
-	source = xuan-major.png
+	provides = xuan-music
+	conflicts = xuan-music
+	source = https://music.jrr.lol
+	source = xuan-music.desktop
+	source = xuan-music.png
 	sha256sums = SKIP
 	sha256sums = ${desktop_sha256}
 	sha256sums = ${icon_sha256}
 
-pkgname = xuan-major-bin
+pkgname = xuan-music-bin
 EOF
 
 echo "Updated AUR files for version ${version}"

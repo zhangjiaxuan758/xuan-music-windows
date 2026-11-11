@@ -29,8 +29,8 @@ dist-ssr
 dev-dist/
 example/
 release/
-packaging/aur/xuan-major-bin/FIRST_RELEASE.md
-packaging/aur/xuan-major-bin/README.md
+packaging/aur/xuan-music-bin/FIRST_RELEASE.md
+packaging/aur/xuan-music-bin/README.md
 .codex
 .codex-tmp
 .wrangler/tmp

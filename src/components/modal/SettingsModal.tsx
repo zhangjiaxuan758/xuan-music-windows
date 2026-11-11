@@ -73,14 +73,14 @@ interface SettingsModalProps {
     customTheme?: DualTheme | null;
 }
 
-const QUARK_DOWNLOAD_URL = 'https://pan.quark.cn/s/6e4c6fa3bc6f';
-const DEFAULT_UPDATE_CHANNEL: 'realeco' | 'limo' | 'cielo' | 'internal' = __APP_RELEASE_CHANNEL__ === 'limo'
-    ? 'limo'
-    : __APP_RELEASE_CHANNEL__ === 'cielo'
-        ? 'cielo'
+const OFFICIAL_DOWNLOAD_URL = 'https://music.jrr.lol';
+const DEFAULT_UPDATE_CHANNEL: 'stable' | 'preview' | 'canary' | 'internal' = __APP_RELEASE_CHANNEL__ === 'preview'
+    ? 'preview'
+    : __APP_RELEASE_CHANNEL__ === 'canary'
+        ? 'canary'
         : __APP_RELEASE_CHANNEL__ === 'internal'
             ? 'internal'
-            : 'realeco';
+            : 'stable';
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
     onClose,
@@ -383,7 +383,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     const [stageActionStatus, setStageActionStatus] = useState<'idle' | 'regenerating'>('idle');
     const configuredAiProvider = isElectron ? electronSettings.AI_PROVIDER : getWebAiProvider();
     const aiServiceLabel = configuredAiProvider === 'openai' ? 'OpenAI Compatible' : 'Google Gemini';
-    const showQuarkDownload = electronSettings.UPDATE_CHANNEL === 'realeco';
+    const showOfficialDownload = electronSettings.UPDATE_CHANNEL === 'stable';
     useEffect(() => {
         if ((window as any).electron) {
             setIsElectron(true);
@@ -567,7 +567,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }
     };
 
-    const handleUpdateChannelChange = async (channel: 'realeco' | 'limo' | 'cielo') => {
+    const handleUpdateChannelChange = async (channel: 'stable' | 'preview' | 'canary') => {
         if (!window.electron?.saveSettings) {
             return;
         }
@@ -607,8 +607,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         await window.electron?.quitAndInstallUpdate?.();
     };
 
-    const handleOpenChinaDownload = async () => {
-        await openExternalUrl(QUARK_DOWNLOAD_URL);
+    const handleOpenOfficialDownload = async () => {
+        await openExternalUrl(OFFICIAL_DOWNLOAD_URL);
     };
 
     // Navidrome Settings State
@@ -1322,17 +1322,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                                     )
                                                 )}
 
-                                                {showQuarkDownload && updateStatus.platform !== 'linux' && (
+                                                {showOfficialDownload && updateStatus.platform !== 'linux' && (
                                                     <>
                                                         <span className="opacity-25 select-none" style={{ color: 'var(--text-secondary)' }}>|</span>
 
                                                         <button
                                                             type="button"
-                                                            onClick={handleOpenChinaDownload}
+                                                            onClick={handleOpenOfficialDownload}
                                                             className="opacity-55 hover:opacity-100 transition-opacity hover:underline"
                                                             style={{ color: 'var(--text-secondary)' }}
                                                         >
-                                                            {t('options.downloadChina')}
+                                                            {t('options.downloadOfficial')}
                                                         </button>
                                                     </>
                                                 )}
@@ -1341,11 +1341,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => window.electron?.openUpdateReleasePage(updateStatus.availableVersion)}
+                                                    onClick={handleOpenOfficialDownload}
                                                     className="opacity-55 hover:opacity-100 transition-opacity hover:underline"
                                                     style={{ color: 'var(--text-secondary)' }}
                                                 >
-                                                    {t('options.goToGithubRelease')}
+                                                    {t('options.goToOfficialDownload')}
                                                 </button>
                                             </div>
                                         )}
@@ -1362,8 +1362,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                                             : t('options.manualUpdateNotice')}
                                                     </div>
                                                 )}
-                                                {showQuarkDownload && updateStatus.platform !== 'linux' && (
-                                                    <div>{t('options.chinaDownloadHint')}</div>
+                                                {showOfficialDownload && updateStatus.platform !== 'linux' && (
+                                                    <div>{t('options.officialDownloadHint')}</div>
                                                 )}
                                             </div>
                                         )}
@@ -1596,7 +1596,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                                     onCheckForUpdates: handleCheckForUpdates,
                                                     onDownloadUpdate: handleDownloadUpdate,
                                                     onInstallUpdate: handleInstallUpdate,
-                                                    onOpenChinaDownload: handleOpenChinaDownload,
+                                                    onOpenChinaDownload: handleOpenOfficialDownload,
                                                     onUpdateChannelChange: handleUpdateChannelChange,
                                                     onSaveElectronSettings: saveElectronSettings,
                                                     onToggleAutoUpdate: handleToggleAutoUpdate,

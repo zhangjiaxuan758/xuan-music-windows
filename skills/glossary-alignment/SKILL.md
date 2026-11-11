@@ -218,7 +218,7 @@ description: Use when the user refers to repository-specific terms such as home 
   -> bridge hook: `src/hooks/useAppPreferences.ts`
   -> related type in `src/types.ts`
 
-- “更新通道”“limo 通道”“cielo 通道”
+- “更新通道”“preview 通道”“canary 通道”
   -> `electron/updateChannels.cjs` / `electron/main.cjs`
 
 - “自定义字重”

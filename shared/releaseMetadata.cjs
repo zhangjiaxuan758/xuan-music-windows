@@ -1,12 +1,12 @@
-// shared/realecoReleaseMetadata.cjs
-// Validates the three version sources that authorize a Realeco release.
+// shared/releaseMetadata.cjs
+// Validates the three version sources that authorize a release.
 
 const RELEASE_VERSION_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+$/;
 const RELEASE_FILE_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+\r?\n?$/;
 
-function validateRealecoReleaseMetadata({ commitMessage, releaseFileContent, packageVersion }) {
+function validateReleaseMetadata({ commitMessage, releaseFileContent, packageVersion }) {
   if (!RELEASE_FILE_PATTERN.test(releaseFileContent)) {
-    throw new Error('realeco-release must contain exactly one A.B.C version line.');
+    throw new Error('release file must contain exactly one A.B.C version line.');
   }
 
   const commitMatch = /^release: v([0-9]+\.[0-9]+\.[0-9]+)$/.exec(commitMessage);
@@ -20,12 +20,12 @@ function validateRealecoReleaseMetadata({ commitMessage, releaseFileContent, pac
     throw new Error('package.json version must be a plain A.B.C version.');
   }
   if (commitVersion !== releaseFileVersion || packageVersion !== releaseFileVersion) {
-    throw new Error(`Release versions must match: commit=${commitVersion}, realeco-release=${releaseFileVersion}, package.json=${packageVersion}.`);
+    throw new Error(`Release versions must match: commit=${commitVersion}, release-file=${releaseFileVersion}, package.json=${packageVersion}.`);
   }
 
   return releaseFileVersion;
 }
 
 module.exports = {
-  validateRealecoReleaseMetadata,
+  validateReleaseMetadata,
 };

@@ -222,7 +222,7 @@ src/
 - 本地曲库数据库已由 Dexie 全面管理，并保留原生 IndexedDB v6 数据兼容。艺术家/专辑 UUID 与显示名称、文件路径和在线来源 ID 相互独立；GridView 按 assignment 中的实体 UUID 导航。
 - 主题同步 registry 已从 legacy localStorage 迁移到 IndexedDB 的 `theme_registry` store；首次读取时会做一次性迁移，不要在业务组件里直接维护 registry。
 - 同步服务的主题同步与视觉设置同步是两个动作：`sync-now` 只同步 AI 主题；完整视觉设置的拉取/推送和 zip library 导入导出位于 `StorageSettingsSection.tsx`。
-- Electron 更新逻辑已模块化到 `electron/updateChannels.cjs`，支持 release、limo 和 cielo 等多更新通道检查。
+- Electron 更新逻辑已模块化到 `electron/updateChannels.cjs`，支持正式版、预览版与内测版等多更新通道检查。
 - 歌词解析优先从 `parserCore.ts` 理解，不要从旧兼容层反推。
 - 歌词与字幕字重必须通过 `resolveThemeFontWeight(theme, modeFallback)` 统一解析，且 DOM、Canvas、pretext 与光栅化渲染保持一致；取消自定义字体时会自动重置字体栈与相关设置。
 - 不要用高频 `useState`、store setter 或 reducer 追踪当前精确播放时间来驱动每帧动画；连续时间优先走 `MotionValue`、CSS / Framer Motion、canvas draw loop 或 `useRef`，React state 只承载当前行、模式、可见段落等离散状态。

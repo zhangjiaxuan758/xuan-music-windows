@@ -35,7 +35,7 @@ export interface XuanConfig {
   };
   announcement: { enabled: boolean; title: string; content: string; id: number };
   texts: Record<string, string>;
-  links: { github: string };
+  links: { official: string };
   update: { versionCode: number; versionName: string; apkFile: string; changelog: string; force: boolean };
   updateWindows?: { versionCode: number; versionName: string; exeFile: string; changelog: string; force: boolean };
 }

@@ -49,7 +49,8 @@ export async function resolveCurrentVersionCode(): Promise<number> {
 // 管理端「更新说明」留空时的兜底文案（服务端也会下发同一默认值）
 export const DEFAULT_CHANGELOG = '修复已知问题，请尽快更新';
 
-const CHECKED_KEY = 'xuan_update_checked_session';
+// 每次冷启动都检查并弹窗；点「取消」只关闭本次弹窗，不写入任何抑制标记，
+// 保证下次启动仍会重新弹（与旧版行为一致）。
 
 function el(tag: string, style: Partial<CSSStyleDeclaration>, text?: string): HTMLElement {
   const n = document.createElement(tag);
@@ -96,15 +97,16 @@ function showUpdateDialog(info: UpdateInfo, onConfirm: () => void) {
   };
 
   const close = () => { overlay.remove(); dialogOpen = false; };
-  const cancel = btn('取消', false, () => {
-    try { sessionStorage.setItem(CHECKED_KEY, '1'); } catch { /* noop */ }
-    close();
-  });
+  // 取消：仅关闭弹窗，不记录任何状态 → 下次启动仍会重新弹
+  const cancel = btn('取消', false, () => { close(); });
+  // 确定：关闭弹窗并立即开始下载/更新
   const confirm = btn('确定', true, () => { close(); onConfirm(); });
   row.append(cancel, confirm);
   card.append(title, ver, desc, row);
   overlay.append(card);
-  overlay.addEventListener('click', e => { if (e.target === overlay) cancel.click(); });
+  // 强模态：点击遮罩/卡片外的任何位置都不关闭，只有「取消」「确定」可操作
+  overlay.addEventListener('click', e => { e.stopPropagation(); });
+  card.addEventListener('click', e => { e.stopPropagation(); });
   document.body.append(overlay);
 }
 
@@ -232,14 +234,20 @@ const isDesktop = (): boolean =>
   typeof window !== 'undefined' &&
   (window as unknown as { __xuanDesktop?: boolean }).__xuanDesktop === true;
 
-/** 启动时调用：安卓 App 检查 APK 通道；Windows 桌面版检查 exe 通道；纯网页端不检查。 */
+let updaterStarted = false;
+
+/**
+ * 启动时调用：安卓 App 检查 APK 通道；Windows 桌面版检查 exe 通道；纯网页端不检查。
+ * 「第一时间」：不等待配置拉取（initXuanServer 的 fetchServerConfig/SSE），
+ * 票据由 checkUpdate 内部按需自取，因此这里直接并行发起更新检查，
+ * 让新版本弹窗在应用起来后立刻呈现，而不是被其它初始化串行阻塞。
+ * 每次冷启动都会执行一遍；点取消只关本次弹窗，下次启动照样弹。
+ */
 export async function initAppUpdater() {
+  if (updaterStarted) return;
+  updaterStarted = true;
   const desktop = isDesktop();
   if (!Capacitor.isNativePlatform() && !desktop) return;
-  try {
-    if (sessionStorage.getItem(CHECKED_KEY)) return;   // 本次启动已询问过
-  } catch { /* noop */ }
-  await initXuanServer();
   // 桌面版读服务端 updateWindows 段（与安卓 APK 通道完全独立）
   const info = await checkUpdate(false, desktop ? 'windows' : 'android');
   const current = await resolveCurrentVersionCode();

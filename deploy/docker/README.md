@@ -11,10 +11,10 @@ mkdir xuan-docker
 cd xuan-docker
 
 curl -fL \
-  https://raw.githubusercontent.com/chthollyphile/xuan-major/main/deploy/docker/compose.yaml \
+  https://music.jrr.lol/deploy/compose.yaml \
   -o compose.yaml
 curl -fL \
-  https://raw.githubusercontent.com/chthollyphile/xuan-major/main/deploy/docker/.env.example \
+  https://music.jrr.lol/deploy/.env.example \
   -o .env
 ```
 

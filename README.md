@@ -1,7 +1,5 @@
 # 小轩音乐 · Android
 
-> 源码仓库：https://github.com/zhangjiaxuan758/xuan-music （软件设置「关于」页与帮助文档均指向此地址）
-
 
 小轩音乐 1.6.5（包名 `com.music.xuan`），基于 Capacitor 的 Android 横屏全屏音乐播放器。
 

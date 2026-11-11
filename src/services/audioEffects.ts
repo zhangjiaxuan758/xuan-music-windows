@@ -206,7 +206,7 @@ const forwardState = (enabled: boolean, presetIndex: number): void => {
     }
 };
 
-/** 把当前设置推送给 C++ 引擎。音效关闭时 C++ 仍保留常驻隐藏超重低音层。 */
+/** 把当前设置推送给 C++ 引擎。音效关闭时 C++ 完全直通（bit-transparent）。 */
 const applySettings = (settings?: XuanAudioEffectSettings): void => {
     const s = settings || readXuanAudioEffects();
     const presetId: XuanEffectPreset = s.enabled && s.preset !== 'off' ? s.preset : 'off';
@@ -215,6 +215,26 @@ const applySettings = (settings?: XuanAudioEffectSettings): void => {
     if (activeContext && activeContext.state === 'suspended') {
         void activeContext.resume().catch(() => { });
     }
+};
+
+/**
+ * 切回前台 / 恢复播放时调用：清空 C++ 引擎（含 AudioWorklet 内独立实例）的
+ * 滤波器历史、DRC 包络与混响延迟线，避免挂起→恢复瞬间的状态突变产生爆音。
+ * 同时对已注册的 seekDuckNode 做一次极短淡入兜底。
+ */
+export const resetXuanAudioEffects = (): void => {
+    try { if (cppEngine) cppEngine.resetState(); } catch { /* noop */ }
+    try { if (workletNode) workletNode.port.postMessage({ type: 'reset' }); } catch { /* noop */ }
+    try {
+        if (seekDuckNode) {
+            const ctx = seekDuckNode.context;
+            const now = ctx.currentTime;
+            const g = seekDuckNode.gain;
+            g.cancelScheduledValues(now);
+            g.setValueAtTime(0.0001, now);
+            g.linearRampToValueAtTime(1, now + 0.06);
+        }
+    } catch { /* noop */ }
 };
 
 /** 初始化 C++ 引擎（替代旧的系统均衡器探测），index.tsx 启动时调用。 */
@@ -249,6 +269,24 @@ if (typeof window !== 'undefined') {
         applySettings((event as CustomEvent<XuanAudioEffectSettings>).detail);
     });
     window.addEventListener('xuan:server-config', () => applySettings());
+
+    // 切回前台：清空 DSP 状态 + 短淡入，消除「从其他软件返回时的爆音」。
+    // 只在 hidden→visible 的瞬间触发一次，避免可视状态下重复重置。
+    let resumeScheduled = false;
+    const onForeground = () => {
+        if (resumeScheduled) return;
+        resumeScheduled = true;
+        // 稍作延迟，等 AudioContext 真正 resume 后再清状态，避免与恢复竞态
+        window.setTimeout(() => {
+            resumeScheduled = false;
+            resetXuanAudioEffects();
+        }, 80);
+    };
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') onForeground();
+    });
+    window.addEventListener('xuan:app-resume', onForeground);
+    window.addEventListener('focus', onForeground);
 }
 
 /**
@@ -283,6 +321,8 @@ class XuanPump extends AudioWorkletProcessor {
       } else if (d.type === 'state') {
         if (this.ex) this.ex.xe_set_state(d.enabled ? 1 : 0, d.presetIndex);
         else this.pendingState = { enabled: d.enabled, presetIndex: d.presetIndex };
+      } else if (d.type === 'reset') {
+        if (this.ex && this.ex.xe_reset_state) this.ex.xe_reset_state();
       }
     };
   }

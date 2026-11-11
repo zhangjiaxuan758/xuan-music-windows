@@ -216,7 +216,7 @@ $ set HOST=127.0.0.1 && npm run dev
 
 !> 由于接口做了缓存处理 ( 缓存 2 分钟,), 相同的 url 会在两分钟内只向酷狗服务器发一次请求 , 如果遇到不需要缓 存结果的接口 , 可在请求 url 后面加一个时间
 戳参数使 url 不同 , 例子 : /personal/fm?timestamp=1691256061923 (请按自己需求改造缓存中间件(app.js)，源码不复杂) 该缓存机制来源
-于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
+于[Binaryify/NeteaseCloudMusicApi](https://music.jrr.lol)
 
 !> 不要频繁调登录接口,不然可能会被风控,登录状态还存在就不要重复调登录接口
 
@@ -2344,4 +2344,4 @@ const res = await fetch('/audio/match', {
 
 ## License
 
-[The MIT License (MIT)](https://github.com/MakcRe/KuGouMusicApi/blob/main/LICENSE)
+[The MIT License (MIT)](https://music.jrr.lol)

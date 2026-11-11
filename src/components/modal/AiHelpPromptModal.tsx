@@ -8,7 +8,7 @@ import { X as CloseIcon } from 'lucide-react';
 
 // src/components/modal/AiHelpPromptModal.tsx
 
-// 小轩音乐：「遇到问题 / 使用说明」文档一律跳到自建 help.html，不再跳 GitHub。
+// 小轩音乐：「遇到问题 / 使用说明」文档一律跳到自建 help.html。
 const XUAN_GUIDE_URL = 'https://music.jrr.lol/help.html';
 const XUAN_DOCS_URL = 'https://music.jrr.lol/help.html';
 
@@ -99,7 +99,7 @@ export const AiHelpPromptModal: React.FC<AiHelpPromptModalProps> = ({
                         </button>
 
                         <div data-xuan-scroll className="relative z-10 flex-1 min-h-0 space-y-5 overflow-y-auto overscroll-contain xuan-hide-scrollbar pr-1">
-                            {/* 小轩音乐自编文档：内容围绕本应用，仓库链接指向 xuan-music。 */}
+                            {/* 小轩音乐自编文档：内容围绕本应用。 */}
                             <div className="rounded-xl p-1">
                                 <XuanHelpDoc isDaylight={isDaylight} />
                             </div>

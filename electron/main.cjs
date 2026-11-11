@@ -178,12 +178,12 @@ const VOICE_INPUT_PAUSE_ENABLED_SETTING_KEY = 'VOICE_INPUT_PAUSE_ENABLED';
 
 const DEFAULT_STAGE_API_PORT = 32107;
 const DEFAULT_OBS_BROWSER_SOURCE_PORT = 32108;
-const XUAN_RELEASES_URL = 'https://github.com/chthollyphile/xuan-major/releases';
-const XUAN_GITHUB_REPOSITORY = {
-  owner: 'chthollyphile',
-  repo: 'xuan-major',
+const XUAN_RELEASES_URL = 'https://music.jrr.lol';
+const XUAN_UPDATE_REPOSITORY = {
+  owner: 'xuan',
+  repo: 'music',
 };
-const WINDOWS_APP_USER_MODEL_ID = 'top.izuna.xuanmajor';
+const WINDOWS_APP_USER_MODEL_ID = 'com.music.xuan';
 const REMOTE_CONTROL_WINDOW_TITLE = 'Xuan Remote';
 const WINDOW_PLAYBACK_HANDOFF_REQUEST_TIMEOUT_MS = 800;
 const bundledAppIconPath = path.join(__dirname, '../build/icon.png');
@@ -1173,7 +1173,7 @@ function getCurrentReleaseChannel() {
 
 function normalizeUpdateChannelSelection(value) {
   const channel = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  return channel === 'realeco' || channel === 'limo' || channel === 'cielo' ? channel : null;
+  return channel === 'stable' || channel === 'preview' || channel === 'canary' ? channel : null;
 }
 
 function getUpdateCheckSupportReason() {
@@ -1333,7 +1333,7 @@ function configureAutoUpdaterChannel(updater) {
   updater.channel = releaseChannel.updaterChannel;
   updater.allowPrerelease = releaseChannel.allowPrerelease;
 
-  const providerConfig = getUpdateProviderConfig(releaseChannel, XUAN_GITHUB_REPOSITORY);
+  const providerConfig = getUpdateProviderConfig(releaseChannel, XUAN_UPDATE_REPOSITORY);
   if (providerConfig) {
     updater.setFeedURL(providerConfig);
   }

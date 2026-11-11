@@ -9,9 +9,9 @@
  *           滤波节点，也不调用系统均衡器。
  *   - 渲染：正在播放页的频谱柱 / 波形 / 光晕 / 粒子逐像素写入 RGBA 帧缓冲，
  *           由前端 Canvas.putImageData 呈现；像素由本 C++ 生成。
- *   - 隐藏默认超重低音：底层常驻一层「超重低音」，音效未开启时它照常生效，
- *           但 UI 完全不感知（不显示）；音效开启后在它之上再叠加一层超重低音
- *           并叠加用户所选预设。
+ *   - 音效关闭 = 完全直通（bit-transparent），不施加任何隐藏低音 / EQ / 压缩，
+ *           保持原始响度；音效开启时只叠加「用户所选的一层预设」，
+ *           不再额外常驻一层超重低音，避免选超重低音时双层叠加导致浑浊。
  *
  * 零依赖：不 link libm / libc，所有数学函数自包含实现，编译产物不含任何
  * WASM import（用 `wasm-objdump -x` 可验证），因此任意 WebView / Electron
@@ -170,6 +170,8 @@ static u8  g_frame[FRAME_BYTES];
 
 static Biquad g_btB[2], g_btT[2], g_eq[2][NBQ];
 static f32 g_preamp = 1;
+static f32 g_outGain = 1.35f;
+static i32 g_enabled = 0;
 static f32 g_drcEnv = 0, g_drcAtk = 0.9f, g_drcRel = 0.99f, g_drcThr = 0.126f, g_drcRatio = 3, g_drcOn = 1;
 static f32 g_se = 0, g_wet = 0;
 static f32 g_dlyL[DLY], g_dlyR[DLY];
@@ -177,6 +179,8 @@ static int g_dlyIdx = 0;
 static i32 g_sr = 44100;
 
 extern "C" {
+    void xe_reset_state();  /* 前置声明：xe_init 需要调用 */
+
     i32 xe_pcm_l_ptr() { return (i32)(u32)(void *)g_pcmL; }
     i32 xe_pcm_r_ptr() { return (i32)(u32)(void *)g_pcmR; }
     i32 xe_spec_ptr()  { return (i32)(u32)(void *)g_spec; }
@@ -184,40 +188,34 @@ extern "C" {
     i32 xe_frame_w()   { return FRAME_W; }
     i32 xe_frame_h()   { return FRAME_H; }
 
-    /* enabled=0：只有常驻隐藏超重低音；enabled=1：再叠一层超重低音 + 用户预设 */
+    /* enabled=0：完全直通；enabled=1：只叠加用户所选的一层预设 */
     void xe_set_state(i32 enabled, i32 presetId) {
         if (presetId < 0 || presetId > 7) presetId = 0;
         f32 btB = 0, btT = 0, eq[NBQ];
         for (int i = 0; i < NBQ; i++) eq[i] = 0;
 
-        /* ① 常驻隐藏超重低音（0.45 份）—— UI 不显示、始终生效 */
-        const f32 H = 0.45f;
-        btB += 6 * H; btT += -6 * H;
-        for (int i = 0; i < NBQ; i++) eq[i] += SUPER_BASS[i] * H;
-
         f32 thr = -18, ratio = 3, atk = 0.008f, rel = 0.15f, se = 0, wet = 0;
         int drcOn = 1;
-        if (enabled) {
-            /* ② 开启音效：在超重低音基础上「再加一层超重低音」(0.55 份) */
-            const f32 E = 0.55f;
-            btB += 6 * E; btT += -6 * E;
-            for (int i = 0; i < NBQ; i++) eq[i] += SUPER_BASS[i] * E;
-            /* ③ 叠加用户所选预设 */
-            if (presetId != 0) {
-                const Preset &p = PRESETS[presetId];
-                btB += p.btB; btT += p.btT;
-                for (int i = 0; i < NBQ; i++) eq[i] += p.eq[i];
-                thr = p.thr; ratio = p.ratio; atk = p.atk; rel = p.rel;
-                se = p.se; wet = p.wet; drcOn = p.drcOn;
-            }
+        g_enabled = enabled && presetId != 0;
+        if (g_enabled) {
+            /* 只叠加用户所选的一层预设，不再常驻隐藏超重低音 */
+            const Preset &p = PRESETS[presetId];
+            btB = p.btB; btT = p.btT;
+            for (int i = 0; i < NBQ; i++) eq[i] = p.eq[i];
+            thr = p.thr; ratio = p.ratio; atk = p.atk; rel = p.rel;
+            se = p.se; wet = p.wet; drcOn = p.drcOn;
         }
 
-        /* 前置负增益：按最大正增益补偿，防削波破音 */
+        /* 温和前置增益：只对最大正增益做部分补偿，避免整体被压得过小
+         * （旧实现按全量补偿 + 额外 -1dB，导致要开到最大音量才听得清）。
+         * 后端软限幅负责防削波，因此这里可以保留充足响度。 */
         f32 maxGain = 0;
         for (int i = 0; i < NBQ; i++) if (eq[i] > maxGain) maxGain = eq[i];
         if (btB > maxGain) maxGain = btB;
         if (btT > maxGain) maxGain = btT;
-        g_preamp = f_pow10((-f_max(0, maxGain) - 1.0f) / 20);
+        g_preamp = f_pow10((-f_max(0, maxGain) * 0.35f) / 20);
+        /* 基础输出增益：正常音量即可听清，无需把音量/音效拉满 */
+        g_outGain = 1.35f;
 
         for (int ch = 0; ch < 2; ch++) {
             bq_lowshelf(&g_btB[ch], (f32)g_sr, 90, btB);
@@ -236,10 +234,20 @@ extern "C" {
 
     void xe_init(i32 sampleRate) {
         g_sr = sampleRate > 0 ? sampleRate : 44100;
+        xe_reset_state();
+        xe_set_state(0, 0);
+    }
+
+    /* 切回前台 / 恢复播放时调用：清空所有滤波器历史、DRC 包络与混响延迟线，
+     * 避免挂起→恢复时状态突变产生「爆音」。 */
+    void xe_reset_state() {
         g_drcEnv = 0;
         for (int i = 0; i < DLY; i++) { g_dlyL[i] = 0; g_dlyR[i] = 0; }
         g_dlyIdx = 0;
-        xe_set_state(0, 0);
+        for (int ch = 0; ch < 2; ch++) {
+            bq_reset(&g_btB[ch]); bq_reset(&g_btT[ch]);
+            for (int i = 0; i < NBQ; i++) bq_reset(&g_eq[ch][i]);
+        }
     }
 
     static f32 run_chain(int ch, f32 x) {
@@ -252,6 +260,8 @@ extern "C" {
     /* 对 g_pcmL/g_pcmR 就地处理 n 帧（C++ 完成整条 DSP 链） */
     void xe_process(i32 n) {
         if (n > MAX_FRAMES) n = MAX_FRAMES;
+        /* 音效关闭：完全直通，不施加任何处理，保持原始音色与响度 */
+        if (!g_enabled) return;
         for (int i = 0; i < n; i++) {
             f32 L = g_pcmL[i] * g_preamp;
             f32 R = g_pcmR[i] * g_preamp;
@@ -279,9 +289,9 @@ extern "C" {
             R = nr + g_wet * dl * 0.5f;
             g_dlyIdx = (g_dlyIdx + 1) & (DLY - 1);
 
-            /* 软限幅到 0.98 */
-            g_pcmL[i] = 0.98f * f_tanh(L * 1.1f);
-            g_pcmR[i] = 0.98f * f_tanh(R * 1.1f);
+            /* 基础增益 + 软限幅：正常音量即可听清，同时防止削波破音 */
+            g_pcmL[i] = f_tanh(L * g_outGain);
+            g_pcmR[i] = f_tanh(R * g_outGain);
         }
     }
 

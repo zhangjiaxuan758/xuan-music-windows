@@ -34,8 +34,10 @@ export interface XuanCppEngine {
     frameW: number;
     frameH: number;
     init(sampleRate: number): void;
-    /** enabled=false 仍保留常驻隐藏超重低音；enabled=true 再叠加一层 + 用户预设。 */
+    /** enabled=false 完全直通；enabled=true 只叠加一层用户所选预设。 */
     setState(enabled: boolean, presetId: number): void;
+    /** 清空滤波器历史 / DRC 包络 / 混响延迟线，用于切回前台时消除爆音。 */
+    resetState(): void;
     /** 对 pcmL/pcmR 就地处理 n 帧。 */
     process(n: number): void;
     /** 生成一帧 RGBA 到 frame。 */
@@ -52,6 +54,7 @@ interface WasmExports {
     xe_frame_h(): number;
     xe_init(sr: number): void;
     xe_set_state(enabled: number, presetId: number): void;
+    xe_reset_state(): void;
     xe_process(n: number): void;
     xe_render(w: number, h: number, t: number, bands: number): void;
 }
@@ -86,10 +89,11 @@ const buildEngine = (bytes: Uint8Array): Promise<XuanCppEngine | null> =>
                 frameH: fh,
                 init: (sr) => e.xe_init(sr),
                 setState: (enabled, presetId) => e.xe_set_state(enabled ? 1 : 0, presetId),
+                resetState: () => e.xe_reset_state(),
                 process: (n) => e.xe_process(n),
                 render: (w, h, t, bands) => e.xe_render(w, h, t, bands),
             };
-            // 默认采样率先初始化（隐藏超重低音立即生效），链路 attach 时会按真实 sr 再 init。
+            // 默认采样率先初始化（音效关闭时完全直通），链路 attach 时会按真实 sr 再 init。
             engine.init(44100);
             return engine;
         })
