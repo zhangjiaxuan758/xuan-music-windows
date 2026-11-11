@@ -3,7 +3,7 @@ import { motion, useMotionValue, animate, AnimatePresence, useDragControls } fro
 import { ChevronLeft, Disc, Eye, EyeOff, ListFilter, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Theme } from '../types';
-import { useFoliaHexViewport } from './folia-grid/useFoliaHexViewport';
+import { useXuanHexViewport } from './xuan-grid/useXuanHexViewport';
 import { SidePanelList, CollectionListItem } from './shared/SidePanelList';
 import { GridListSearchButton } from './shared/GridListSearchButton';
 import { gridSearchPanelMotion } from './shared/gridSearchPanelMotion';
@@ -11,7 +11,7 @@ import {
     resolveGridMapDisplayIndex,
     resolveGridMapSourceIndex,
     shouldSuppressGridMapSelection,
-} from './folia-grid/gridMapNavigation';
+} from './xuan-grid/gridMapNavigation';
 
 // src/components/GridMap.tsx
 // Hexagonal honeycomb layout showing all collections (playlists, albums, radios).
@@ -430,7 +430,7 @@ export const GridMap: React.FC<GridMapProps> = ({
         renderedIndexes,
         renderedIndexesRef,
         updateRenderedIndexesForViewport,
-    } = useFoliaHexViewport({
+    } = useXuanHexViewport({
         itemCount: displayItems.length,
         spacingX: layoutConfig.spacingX,
         spacingY: layoutConfig.spacingY,

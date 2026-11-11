@@ -95,7 +95,7 @@ import { clearPrefetchRuntime } from './services/prefetchService';
 import { buildLocalLibraryIndex, followEntityRedirect } from './utils/localLibraryIndex';
 import type { PlayerChromeVisibilityMode } from './types/remoteControl';
 
-const LOCAL_MUSIC_UPDATED_EVENT = 'folia-local-music-updated';
+const LOCAL_MUSIC_UPDATED_EVENT = 'xuan-local-music-updated';
 const DEV_DEBUG_SHORTCUT_LABEL = '调试面板';
 const ONLINE_AUDIO_URL_TTL_MS = 1200 * 1000;
 const ONLINE_AUDIO_URL_REFRESH_BUFFER_MS = 60 * 1000;
@@ -217,7 +217,7 @@ export default function App() {
     const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.IDLE);
     const currentTime = useMotionValue(0);
     useEffect(() => {
-        (window as any).__folia_current_time = currentTime;
+        (window as any).__xuan_current_time = currentTime;
     }, [currentTime]);
     const [duration, setDuration] = useState(0);
     const [currentLineIndex, setCurrentLineIndex] = useState(-1);
@@ -767,8 +767,8 @@ export default function App() {
             }
         };
 
-        window.addEventListener('folia-themes-synced', handleSyncCompleted);
-        return () => window.removeEventListener('folia-themes-synced', handleSyncCompleted);
+        window.addEventListener('xuan-themes-synced', handleSyncCompleted);
+        return () => window.removeEventListener('xuan-themes-synced', handleSyncCompleted);
     }, [currentSong, restoreCachedThemeForSong]);
 
     useEffect(() => {

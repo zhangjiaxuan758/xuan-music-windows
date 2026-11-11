@@ -1,6 +1,6 @@
 ---
 name: kugou-provider-alignment
-description: Align Folia's KuGou provider implementation with the repository API documentation and responses from the configured live KuGouMusicApi service. Use when adding or repairing KuGou search, lyrics, playback, account, playlist, album, artist, recommendation, or other provider functionality; when an endpoint path, request parameter, authentication field, or response shape is uncertain; or when validating a KuGou provider change against real data.
+description: Align Xuan's KuGou provider implementation with the repository API documentation and responses from the configured live KuGouMusicApi service. Use when adding or repairing KuGou search, lyrics, playback, account, playlist, album, artist, recommendation, or other provider functionality; when an endpoint path, request parameter, authentication field, or response shape is uncertain; or when validating a KuGou provider change against real data.
 ---
 
 # KuGou Provider Alignment

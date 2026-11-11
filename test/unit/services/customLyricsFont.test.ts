@@ -81,7 +81,7 @@ describe('customLyricsFont', () => {
 
         expect(meta).toEqual({
             source: 'uploaded',
-            family: 'FoliaUploadedLyricsFont_1779580800000_My-Font',
+            family: 'XuanUploadedLyricsFont_1779580800000_My-Font',
             label: 'My Font',
             fontId: '1779580800000_My-Font',
         });

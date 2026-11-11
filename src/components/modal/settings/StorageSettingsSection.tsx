@@ -185,7 +185,7 @@ const StorageSettingsSection: React.FC<StorageSettingsSectionProps> = ({
             if (!url) throw new TypeError('Sync export must produce a Blob');
             const link = document.createElement('a');
             link.href = url;
-            link.download = `folia-sync-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`;
+            link.download = `xuan-sync-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`;
             link.click();
             URL.revokeObjectURL(url);
         } finally {
@@ -296,7 +296,7 @@ const StorageSettingsSection: React.FC<StorageSettingsSectionProps> = ({
                                 type="url"
                                 value={draftSyncConfig.workerBaseUrl}
                                 onChange={(event) => updateDraftSyncConfig({ workerBaseUrl: event.target.value })}
-                                placeholder="https://folia-sync.example.workers.dev"
+                                placeholder="https://xuan-sync.example.workers.dev"
                                 className="w-full rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-sm outline-none focus:border-white/25"
                                 style={{ color: 'var(--text-primary)' }}
                             />

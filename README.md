@@ -1,40 +1,6 @@
-# 小轩音乐 · Windows 端源码（占位符脱敏版）
-
-> **这是给其他人参考的脱敏源码，不是可直接编译出可用 APK 的完整工程。**
-> 所有敏感信息均已替换为 `__PLACEHOLDER_xxx__` 占位符，签名密钥、含密码的说明文件、
-> 本地环境变量、编译产物一律未入库。
->
-> - 仓库：https://github.com/zhangjiaxuan758/xuan-music-windows
-> - 版本：1.6.9（versionCode 10629，Android 10–16，V1/V2/V3 签名）
-> - 本仓库为 Windows 桌面端（Electron）客户端脱敏源码：共用前端 + `desktop/` 桌面壳 + `src/cpp/` C++ 音效/渲染引擎。
-> 移动端源码见 `xuan-music-android` 仓库。
-> - 音效 DSP 与播放器页渲染全部由 C++ 实现（`src/cpp/xuan_engine.cpp` → WebAssembly），
->   移动端与桌面端共用同一份编译产物；可用 `bash src/cpp/build_wasm.sh` 重建（需 clang 18 + wasm-ld）。
-> - 架构：Capacitor + React + TypeScript，客户端直连网易云官方 `music.163.com/eapi`，
->   零私密凭证、账号 Cookie 只存在使用者设备本地。
->
-> ## 需要自行补齐的占位符
->
-> | 位置 | 占位符 | 说明 |
-> |---|---|---|
-> | `src/services/netease.ts` | `__PLACEHOLDER_NETEASE_EAPI_KEY__` / `__PLACEHOLDER_NETEASE_EAPI_SALT__` | 网易云 eapi 公开协议常量，官方网页 JS 中可查 |
-> | `.env.local` | 见 `.env.example` | 本地配置，不入库 |
-> | 签名 | 自备 `.jks` | 发布 APK 需自己的签名证书 |
->
-> 补齐后执行：`npm install` → `npm run build:capacitor` → `npx cap sync android` →
-> `cd android && ./gradlew assembleRelease`，再用 apksigner 做 V1/V2/V3 签名。
->
-> ## 安全提醒
->
-> 任何随 APK 下发或运行时从公网拉取的内容都不是秘密。请勿把 AppSecret / RSA 私钥 /
-> 账号 Cookie 放进客户端或公开仓库；如需自建服务端，密钥只放服务端环境变量，
-> 客户端只拿短时签名令牌。
-
----
-
 # 小轩音乐 · Android
 
-> 源码仓库：https://github.com/zhangjiaxuan758/xuan-music-windows （软件设置「关于」页与帮助文档均指向此地址）
+> 源码仓库：https://github.com/zhangjiaxuan758/xuan-music （软件设置「关于」页与帮助文档均指向此地址）
 
 
 小轩音乐 1.6.5（包名 `com.music.xuan`），基于 Capacitor 的 Android 横屏全屏音乐播放器。

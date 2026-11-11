@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Disc3, ListMusic, Loader2, RefreshCw, Settings2, User } from 'lucide-react';
-import DesktopGrid3DSurface, { DesktopGrid3DAction } from '../../folia-grid/DesktopGrid3DSurface';
+import DesktopGrid3DSurface, { DesktopGrid3DAction } from '../../xuan-grid/DesktopGrid3DSurface';
 import { Theme } from '../../../types';
 import { getNavidromeConfig, navidromeApi } from '../../../services/navidromeService';
 import { SubsonicAlbum, SubsonicArtist, SubsonicPlaylist, SubsonicSong } from '../../../types/navidrome';
@@ -33,7 +33,7 @@ interface NavidromeGrid3DViewProps {
 
 const RANDOM_PLAYLIST_ID = '__navi_random__';
 const FAVORITES_PLAYLIST_ID = '__navi_favorites__';
-const NAVIDROME_LAST_SECTION_KEY = 'folia_navidrome_last_section';
+const NAVIDROME_LAST_SECTION_KEY = 'xuan_navidrome_last_section';
 const ALBUM_PAGE_SIZE = 500;
 const MAX_ALBUM_PAGES = 20;
 

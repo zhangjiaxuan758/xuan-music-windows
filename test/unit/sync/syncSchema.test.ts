@@ -151,7 +151,7 @@ describe('sync schema parsing', () => {
     it('validates every nested record in sync library exports', () => {
         const exportedAt = '2026-07-08T00:00:00.000Z';
         const bundle = parseSyncLibraryExportBundle({
-            kind: 'folia-sync-export',
+            kind: 'xuan-sync-export',
             schemaVersion: 1,
             exportedAt,
             settings: null,
@@ -172,7 +172,7 @@ describe('sync schema parsing', () => {
 
     it('rejects sync library exports with malformed nested records', () => {
         const baseBundle = {
-            kind: 'folia-sync-export',
+            kind: 'xuan-sync-export',
             schemaVersion: 1,
             exportedAt: '2026-07-08T00:00:00.000Z',
             settings: null,

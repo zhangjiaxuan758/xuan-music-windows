@@ -3,7 +3,7 @@ import {
     resolveGridMapDisplayIndex,
     resolveGridMapSourceIndex,
     shouldSuppressGridMapSelection,
-} from '../../../src/components/folia-grid/gridMapNavigation';
+} from '../../../src/components/xuan-grid/gridMapNavigation';
 
 // test/unit/gridView/gridMapNavigation.test.ts
 // Verifies GridMap navigation remains aligned with filtered and refreshed Grid3D collections.

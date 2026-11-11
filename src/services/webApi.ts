@@ -1,8 +1,8 @@
 import { isCapacitorAndroid } from '../platform/runtime';
 
-// 当前文件：解析 Web 与 Capacitor 共用的 Folia 服务端 API 地址。
+// 当前文件：解析 Web 与 Capacitor 共用的 Xuan 服务端 API 地址。
 
-export interface FoliaApiResolutionOptions {
+export interface XuanApiResolutionOptions {
   apiBase?: string | null;
   capacitorAndroid?: boolean;
 }
@@ -11,20 +11,20 @@ const readConfiguredApiBase = (): string => {
   // 优先使用「音源服务器设置」里运行时填写的地址。
   try {
     const runtime = typeof window !== 'undefined'
-      ? String(window.localStorage.getItem('xuan.server.folia') || '').trim()
+      ? String(window.localStorage.getItem('xuan.server.xuan') || '').trim()
       : '';
     if (runtime) return runtime;
   } catch { /* localStorage 不可用时回退到构建时配置 */ }
-  return String(import.meta.env.VITE_FOLIA_API_BASE || '').trim();
+  return String(import.meta.env.VITE_XUAN_API_BASE || '').trim();
 };
 
 const normalizeApiBase = (value: string): string => value.replace(/\/+$/, '');
 const normalizeEndpoint = (value: string): string => value.replace(/^\/+/, '').replace(/^api\/+/, '');
 
 // Builds one API URL while preserving the existing same-origin Web fallback.
-export const resolveFoliaApiUrl = (
+export const resolveXuanApiUrl = (
   endpoint: string,
-  options: FoliaApiResolutionOptions = {},
+  options: XuanApiResolutionOptions = {},
 ): string => {
   const configuredBase = options.apiBase === undefined
     ? readConfiguredApiBase()
@@ -37,7 +37,7 @@ export const resolveFoliaApiUrl = (
   }
 
   if (capacitorAndroid) {
-    throw new Error('VITE_FOLIA_API_BASE must be configured for the Capacitor Android build.');
+    throw new Error('VITE_XUAN_API_BASE must be configured for the Capacitor Android build.');
   }
 
   return `/api/${normalizedEndpoint}`;

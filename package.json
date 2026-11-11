@@ -1,6 +1,6 @@
 {
   "name": "xuan-music-android",
-  "productName": "Folia",
+  "productName": "Xuan",
   "description": "Lyrics Reimagine",
   "author": {
     "name": "xuan-music",
@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:vercel-api && vite build",
-    "build:capacitor": "cross-env FOLIA_BUILD_TARGET=capacitor vite build",
+    "build:capacitor": "cross-env XUAN_BUILD_TARGET=capacitor vite build",
     "build:vercel-api": "tsc -p api-ts/tsconfig.json",
     "preview": "vite preview",
     "cap:sync:android": "npm run build:capacitor && cap sync android",
@@ -39,16 +39,16 @@
     "stage:client": "vite --open /stage-client.html",
     "dev:electron": "cross-env ELECTRON_DEV=true concurrently -k \"vite\" \"wait-on tcp:3000 && electron .\"",
     "dev:electron:dist": "cross-env ELECTRON_DEV=false ELECTRON=true ELECTRON_LINUX_PACKAGED_GRAPHICS=true vite build && electron .",
-    "dev:electron:dist:swiftshader": "cross-env ELECTRON_DEV=false ELECTRON=true ELECTRON_LINUX_PACKAGED_GRAPHICS=true FOLIA_LINUX_GRAPHICS_MODE=swiftshader vite build && electron .",
-    "dev:electron:dist:software": "cross-env ELECTRON_DEV=false ELECTRON=true ELECTRON_LINUX_PACKAGED_GRAPHICS=true FOLIA_LINUX_GRAPHICS_MODE=software vite build && electron .",
+    "dev:electron:dist:swiftshader": "cross-env ELECTRON_DEV=false ELECTRON=true ELECTRON_LINUX_PACKAGED_GRAPHICS=true XUAN_LINUX_GRAPHICS_MODE=swiftshader vite build && electron .",
+    "dev:electron:dist:software": "cross-env ELECTRON_DEV=false ELECTRON=true ELECTRON_LINUX_PACKAGED_GRAPHICS=true XUAN_LINUX_GRAPHICS_MODE=software vite build && electron .",
     "build:electron:dir": "cross-env ELECTRON_DEV=false ELECTRON=true vite build && electron-builder --linux dir",
     "build:electron": "cross-env ELECTRON_DEV=false ELECTRON=true vite build && electron-builder",
     "contributors:add": "npx all-contributors-cli add",
     "contributors:generate": "npx all-contributors-cli generate"
   },
   "build": {
-    "appId": "top.izuna.foliamajor",
-    "productName": "Folia",
+    "appId": "top.izuna.xuanmajor",
+    "productName": "Xuan",
     "generateUpdatesFilesForAllChannels": true,
     "directories": {
       "output": "release"

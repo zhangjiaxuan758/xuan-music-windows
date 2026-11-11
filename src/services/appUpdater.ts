@@ -17,6 +17,7 @@ import { checkUpdate, downloadUrl, initXuanServer, type UpdateInfo } from './xua
 
 const XuanNative = registerPlugin<{
   installApk(options: { path: string }): Promise<{ ok: boolean }>;
+  getApkVersion(): Promise<{ versionCode: number; versionName: string }>;
   updateMedia(options: MediaOptions): Promise<void>;
   hideMedia(): Promise<void>;
 } & Record<string, any>>('XuanNative');
@@ -26,10 +27,24 @@ export interface MediaOptions {
   showFavorite: boolean; liked: boolean;
 }
 
-// 当前客户端 versionCode；构建脚本会注入真实值
+// 当前客户端 versionCode；构建脚本会注入真实值，仅作原生读取失败时的兜底
 declare const __XUAN_VERSION_CODE__: number | undefined;
 export const CURRENT_VERSION_CODE: number =
   (typeof __XUAN_VERSION_CODE__ !== 'undefined' ? __XUAN_VERSION_CODE__ : 10629);
+
+/**
+ * 运行时版本码：优先从原生 PackageManager 读取 APK 真实 versionCode。
+ * 构建注入值可能过期（旧构建弹「有新版」、系统装不上同版本），原生读取才能根治。
+ */
+export async function resolveCurrentVersionCode(): Promise<number> {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const v = await XuanNative.getApkVersion();
+      if (v && Number.isFinite(v.versionCode) && v.versionCode > 0) return v.versionCode;
+    } catch { /* 旧包无此方法时走兜底 */ }
+  }
+  return CURRENT_VERSION_CODE;
+}
 
 // 管理端「更新说明」留空时的兜底文案（服务端也会下发同一默认值）
 export const DEFAULT_CHANGELOG = '修复已知问题，请尽快更新';
@@ -227,7 +242,8 @@ export async function initAppUpdater() {
   await initXuanServer();
   // 桌面版读服务端 updateWindows 段（与安卓 APK 通道完全独立）
   const info = await checkUpdate(false, desktop ? 'windows' : 'android');
-  if (!info || !info.hasApk || info.versionCode <= CURRENT_VERSION_CODE) return;
+  const current = await resolveCurrentVersionCode();
+  if (!info || !info.hasApk || info.versionCode <= current) return;
   if (desktop) {
     // exe 无法像 APK 那样静默安装：确认后交给系统默认浏览器下载安装包，
     // 用户运行 Setup 覆盖安装即可（同 appId、数据保留）。

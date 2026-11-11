@@ -18,7 +18,7 @@ const isAppImageRuntime =
 const linuxGraphicsMode =
   process.platform !== 'linux'
     ? 'system'
-    : (process.env.FOLIA_LINUX_GRAPHICS_MODE || (isAppImageRuntime ? 'swiftshader' : 'system'));
+    : (process.env.XUAN_LINUX_GRAPHICS_MODE || (isAppImageRuntime ? 'swiftshader' : 'system'));
 
 // Trusts only the known KuGou media CDN hostname mismatch while preserving TLS checks elsewhere.
 app.on('certificate-error', (event, _webContents, requestUrl, error, _certificate, callback) => {
@@ -71,7 +71,7 @@ if (process.platform === 'darwin' && process.arch === 'x64') {
   app.commandLine.appendSwitch('enable-gpu-rasterization');
 }
 
-const store = new Store({ projectName: 'Folia' });
+const store = new Store({ projectName: 'Xuan' });
 const kugouApiBridge = createKugouApiBridge({ store });
 
 // --- Electron main process locale map ---
@@ -178,13 +178,13 @@ const VOICE_INPUT_PAUSE_ENABLED_SETTING_KEY = 'VOICE_INPUT_PAUSE_ENABLED';
 
 const DEFAULT_STAGE_API_PORT = 32107;
 const DEFAULT_OBS_BROWSER_SOURCE_PORT = 32108;
-const FOLIA_RELEASES_URL = 'https://github.com/chthollyphile/folia-major/releases';
-const FOLIA_GITHUB_REPOSITORY = {
+const XUAN_RELEASES_URL = 'https://github.com/chthollyphile/xuan-major/releases';
+const XUAN_GITHUB_REPOSITORY = {
   owner: 'chthollyphile',
-  repo: 'folia-major',
+  repo: 'xuan-major',
 };
-const WINDOWS_APP_USER_MODEL_ID = 'top.izuna.foliamajor';
-const REMOTE_CONTROL_WINDOW_TITLE = 'Folia Remote';
+const WINDOWS_APP_USER_MODEL_ID = 'top.izuna.xuanmajor';
+const REMOTE_CONTROL_WINDOW_TITLE = 'Xuan Remote';
 const WINDOW_PLAYBACK_HANDOFF_REQUEST_TIMEOUT_MS = 800;
 const bundledAppIconPath = path.join(__dirname, '../build/icon.png');
 const extraResourceIconPath = path.join(process.resourcesPath, 'icon.png');
@@ -746,7 +746,7 @@ function refreshTrayMenu() {
   ]);
 
   appTray.setContextMenu(menu);
-  appTray.setToolTip('Folia');
+  appTray.setToolTip('Xuan');
 }
 
 function ensureTray() {
@@ -1158,7 +1158,7 @@ function getPackagedReleaseChannel() {
   try {
     const packageJsonPath = path.join(app.getAppPath(), 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    return packageJson.foliaReleaseChannel;
+    return packageJson.xuanReleaseChannel;
   } catch {
     return null;
   }
@@ -1200,7 +1200,7 @@ const updateState = {
   status: 'idle',
   currentVersion: normalizeVersion(app.getVersion()),
   availableVersion: null,
-  updateUrl: FOLIA_RELEASES_URL,
+  updateUrl: XUAN_RELEASES_URL,
   error: null,
   lastCheckedAt: null,
   downloadProgress: null,
@@ -1280,7 +1280,7 @@ function setupAutoUpdater() {
     setUpdateState({
       status: 'available',
       availableVersion: version || null,
-      updateUrl: getReleaseUrl(getCurrentReleaseChannel().id, version, FOLIA_RELEASES_URL),
+      updateUrl: getReleaseUrl(getCurrentReleaseChannel().id, version, XUAN_RELEASES_URL),
       error: null,
       lastCheckedAt: Date.now(),
       downloadProgress: null,
@@ -1291,7 +1291,7 @@ function setupAutoUpdater() {
     setUpdateState({
       status: 'latest',
       availableVersion: null,
-      updateUrl: FOLIA_RELEASES_URL,
+      updateUrl: XUAN_RELEASES_URL,
       error: null,
       lastCheckedAt: Date.now(),
       downloadProgress: null,
@@ -1333,7 +1333,7 @@ function configureAutoUpdaterChannel(updater) {
   updater.channel = releaseChannel.updaterChannel;
   updater.allowPrerelease = releaseChannel.allowPrerelease;
 
-  const providerConfig = getUpdateProviderConfig(releaseChannel, FOLIA_GITHUB_REPOSITORY);
+  const providerConfig = getUpdateProviderConfig(releaseChannel, XUAN_GITHUB_REPOSITORY);
   if (providerConfig) {
     updater.setFeedURL(providerConfig);
   }
@@ -1427,8 +1427,8 @@ function markUpdateSeen(version) {
 async function openUpdateReleasePage(version) {
   const normalizedVersion = normalizeVersion(version || updateState.availableVersion);
   const url = normalizedVersion
-    ? getReleaseUrl(getCurrentReleaseChannel().id, normalizedVersion, FOLIA_RELEASES_URL)
-    : updateState.updateUrl || FOLIA_RELEASES_URL;
+    ? getReleaseUrl(getCurrentReleaseChannel().id, normalizedVersion, XUAN_RELEASES_URL)
+    : updateState.updateUrl || XUAN_RELEASES_URL;
 
   await shell.openExternal(url);
   return true;
@@ -2672,7 +2672,7 @@ function createRemoteControlWindow() {
     hasShadow: false,
     backgroundColor: '#00000000',
     title: REMOTE_CONTROL_WINDOW_TITLE,
-    name: 'folia-remote',
+    name: 'xuan-remote',
     autoHideMenuBar: true,
     resizable: false,
     minimizable: true,
@@ -2747,7 +2747,7 @@ async function getMainWindowCaptureSource() {
   const source =
     (mediaSourceId && sources.find(item => item.id === mediaSourceId)) ||
     sources.find(item => item.name === title && item.name !== REMOTE_CONTROL_WINDOW_TITLE) ||
-    sources.find(item => item.name.toLowerCase().includes('folia') && item.name !== REMOTE_CONTROL_WINDOW_TITLE) ||
+    sources.find(item => item.name.toLowerCase().includes('xuan') && item.name !== REMOTE_CONTROL_WINDOW_TITLE) ||
     null;
 
   return source ? { id: source.id, name: source.name } : null;
@@ -3038,7 +3038,7 @@ ipcMain.handle('save-settings', (event, key, value) => {
     setUpdateState({
       status: getUpdateCheckEnabled() && isUpdateCheckSupported() ? 'idle' : 'unsupported',
       availableVersion: null,
-      updateUrl: FOLIA_RELEASES_URL,
+      updateUrl: XUAN_RELEASES_URL,
       error: null,
       downloadProgress: null,
     });
@@ -3671,7 +3671,7 @@ ipcMain.handle('video-export-choose-path', async (event, defaultName, extension,
     : (safeExtension === 'mp4' ? 'MP4 Video' : 'WebM Video');
   const safeDefaultName = typeof defaultName === 'string' && defaultName.trim()
     ? defaultName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_')
-    : `folia-export.${safeExtension}`;
+    : `xuan-export.${safeExtension}`;
   const defaultFileName = safeDefaultName.endsWith(`.${safeExtension}`)
     ? safeDefaultName
     : `${safeDefaultName.replace(/\.[^.]+$/, '')}.${safeExtension}`;

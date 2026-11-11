@@ -1,6 +1,6 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// 当前文件：Folia Android Capacitor 容器的构建与 WebView 配置。
+// 当前文件：Xuan Android Capacitor 容器的构建与 WebView 配置。
 
 const config: CapacitorConfig = {
   appId: 'com.music.xuan',

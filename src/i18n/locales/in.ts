@@ -1463,6 +1463,6 @@
     "copyPromptTitle": "1. Salin Prompt AI",
     "copyPromptDesc": "Salin prompt dan tempel ke model AI apa pun untuk membuat tema Anda.",
     "importJsonTitle": "2. Tempel Hasil JSON",
-    "prompt": "Saya menggunakan pemutar musik 小轩音乐 di GitHub dan butuh bantuan untuk masalah.\n\nPanduan 小轩音乐: {{guideUrl}}\nRepositori 小轩音乐: {{repoUrl}}\n\nSilakan gunakan referensi ini sebagai konteks, lalu bantu saya memahami dan menyelesaikan masalah yang saya jelaskan berikutnya. Jika ada informasi yang kurang, tanyakan apa yang harus saya berikan sebelum membuat asumsi yang tidak pasti."
+    "prompt": "Saya menggunakan pemutar musik 小轩音乐 dan butuh bantuan untuk masalah.\n\nPanduan 小轩音乐: {{guideUrl}}\n\nSilakan gunakan referensi ini sebagai konteks, lalu bantu saya memahami dan menyelesaikan masalah yang saya jelaskan berikutnya. Jika ada informasi yang kurang, tanyakan apa yang harus saya berikan sebelum membuat asumsi yang tidak pasti."
   }
 } as const;

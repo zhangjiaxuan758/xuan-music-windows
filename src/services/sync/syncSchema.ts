@@ -132,7 +132,7 @@ export const parseSyncedThemeRecords = (value: unknown): SyncedThemeRecord[] => 
 
 export const parseSyncLibraryExportBundle = (value: unknown): SyncLibraryExportBundle | null => {
     if (!isRecord(value)
-        || value.kind !== 'folia-sync-export'
+        || value.kind !== 'xuan-sync-export'
         || !isSchemaCompatible(value.schemaVersion)
         || !isIsoDateString(value.exportedAt)
         || !Array.isArray(value.themes)
@@ -153,7 +153,7 @@ export const parseSyncLibraryExportBundle = (value: unknown): SyncLibraryExportB
     }
 
     return {
-        kind: 'folia-sync-export',
+        kind: 'xuan-sync-export',
         schemaVersion: SYNC_SCHEMA_VERSION,
         exportedAt: value.exportedAt,
         settings,

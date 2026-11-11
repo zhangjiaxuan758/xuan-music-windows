@@ -3,7 +3,7 @@ import {
     getGrid3DSliderSecondaryText,
     getGrid3DSliderSummaryText,
     resolveGrid3DWheelInput,
-} from '../../../src/components/folia-grid/Grid3DSlider';
+} from '../../../src/components/xuan-grid/Grid3DSlider';
 
 // test/unit/gridView/grid3DSlider.test.ts
 // Verifies collection cards use real descriptions instead of a hard-coded symbol.

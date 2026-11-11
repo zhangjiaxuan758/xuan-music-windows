@@ -26,10 +26,10 @@ RUN apk add --no-cache gettext
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY deploy/docker/gateway/nginx.conf.template /etc/nginx/nginx.conf.template
-COPY deploy/docker/gateway/entrypoint.sh /usr/local/bin/folia-gateway
-RUN chmod 0555 /usr/local/bin/folia-gateway
+COPY deploy/docker/gateway/entrypoint.sh /usr/local/bin/xuan-gateway
+RUN chmod 0555 /usr/local/bin/xuan-gateway
 
 USER nginx
 EXPOSE 8080
 
-ENTRYPOINT ["/usr/local/bin/folia-gateway"]
+ENTRYPOINT ["/usr/local/bin/xuan-gateway"]

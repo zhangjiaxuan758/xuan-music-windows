@@ -1,14 +1,14 @@
-name: folia
+name: xuan
 
 services:
   gateway:
-    image: ${FOLIA_IMAGE_NAMESPACE:?Set FOLIA_IMAGE_NAMESPACE}/folia-web:${FOLIA_STACK_VERSION:-latest}
+    image: ${XUAN_IMAGE_NAMESPACE:?Set XUAN_IMAGE_NAMESPACE}/xuan-web:${XUAN_STACK_VERSION:-latest}
     restart: unless-stopped
     read_only: true
     environment:
-      FOLIA_AI_PROVIDER: ${FOLIA_AI_PROVIDER:-google}
+      XUAN_AI_PROVIDER: ${XUAN_AI_PROVIDER:-google}
     ports:
-      - "${FOLIA_HTTP_BIND:-0.0.0.0}:${FOLIA_HTTP_PORT:-18080}:8080"
+      - "${XUAN_HTTP_BIND:-0.0.0.0}:${XUAN_HTTP_PORT:-18080}:8080"
     tmpfs:
       - /tmp
       - /var/cache/nginx:uid=101,gid=101,mode=0750
@@ -26,13 +26,13 @@ services:
       kugou-api:
         condition: service_healthy
     networks:
-      - folia-edge
-      - folia-internal
+      - xuan-edge
+      - xuan-internal
     security_opt:
       - no-new-privileges:true
 
   backend:
-    image: ${FOLIA_IMAGE_NAMESPACE:?Set FOLIA_IMAGE_NAMESPACE}/folia-web-api:${FOLIA_STACK_VERSION:-latest}
+    image: ${XUAN_IMAGE_NAMESPACE:?Set XUAN_IMAGE_NAMESPACE}/xuan-web-api:${XUAN_STACK_VERSION:-latest}
     restart: unless-stopped
     read_only: true
     environment:
@@ -53,19 +53,19 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - folia-internal
-      - folia-egress
+      - xuan-internal
+      - xuan-egress
     security_opt:
       - no-new-privileges:true
 
   netease-api:
-    image: ${FOLIA_IMAGE_NAMESPACE:?Set FOLIA_IMAGE_NAMESPACE}/folia-netease-api:${FOLIA_STACK_VERSION:-latest}
+    image: ${XUAN_IMAGE_NAMESPACE:?Set XUAN_IMAGE_NAMESPACE}/xuan-netease-api:${XUAN_STACK_VERSION:-latest}
     restart: unless-stopped
     read_only: true
     environment:
       HOST: 0.0.0.0
       PORT: "3000"
-      FOLIA_FORWARD_CLIENT_IP: ${FOLIA_FORWARD_CLIENT_IP:-false}
+      XUAN_FORWARD_CLIENT_IP: ${XUAN_FORWARD_CLIENT_IP:-false}
       ENABLE_GENERAL_UNBLOCK: ${ENABLE_GENERAL_UNBLOCK:-false}
     expose:
       - "3000"
@@ -78,19 +78,19 @@ services:
       retries: 15
       start_period: 30s
     networks:
-      - folia-internal
-      - folia-egress
+      - xuan-internal
+      - xuan-egress
     security_opt:
       - no-new-privileges:true
 
   kugou-api:
-    image: ${FOLIA_IMAGE_NAMESPACE:?Set FOLIA_IMAGE_NAMESPACE}/folia-kugou-api:${FOLIA_STACK_VERSION:-latest}
+    image: ${XUAN_IMAGE_NAMESPACE:?Set XUAN_IMAGE_NAMESPACE}/xuan-kugou-api:${XUAN_STACK_VERSION:-latest}
     restart: unless-stopped
     read_only: true
     environment:
       HOST: 0.0.0.0
       PORT: "3000"
-      FOLIA_FORWARD_CLIENT_IP: ${FOLIA_FORWARD_CLIENT_IP:-false}
+      XUAN_FORWARD_CLIENT_IP: ${XUAN_FORWARD_CLIENT_IP:-false}
     expose:
       - "3000"
     tmpfs:
@@ -102,24 +102,24 @@ services:
       retries: 15
       start_period: 20s
     networks:
-      - folia-internal
-      - folia-egress
+      - xuan-internal
+      - xuan-egress
     security_opt:
       - no-new-privileges:true
 
   sync-server:
-    image: ${FOLIA_IMAGE_NAMESPACE:?Set FOLIA_IMAGE_NAMESPACE}/folia-sync-server:${FOLIA_SYNC_VERSION:-latest}
+    image: ${XUAN_IMAGE_NAMESPACE:?Set XUAN_IMAGE_NAMESPACE}/xuan-sync-server:${XUAN_SYNC_VERSION:-latest}
     restart: unless-stopped
     read_only: true
     environment:
       PORT: "3000"
-      DB_PATH: /app/data/folia-sync.db
+      DB_PATH: /app/data/xuan-sync.db
       SYNC_TOKEN: ${SYNC_TOKEN:?Set SYNC_TOKEN to at least 8 characters}
       DASHBOARD_TOKEN: ${DASHBOARD_TOKEN:-}
     ports:
-      - "${FOLIA_SYNC_BIND:-0.0.0.0}:${FOLIA_SYNC_PORT:-13000}:3000"
+      - "${XUAN_SYNC_BIND:-0.0.0.0}:${XUAN_SYNC_PORT:-13000}:3000"
     volumes:
-      - "${FOLIA_SYNC_DATA_DIR:-./data/sync}:/app/data"
+      - "${XUAN_SYNC_DATA_DIR:-./data/sync}:/app/data"
     tmpfs:
       - /tmp
     healthcheck:
@@ -129,17 +129,17 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - folia-sync
+      - xuan-sync
     security_opt:
       - no-new-privileges:true
 
 networks:
-  folia-edge:
+  xuan-edge:
     driver: bridge
-  folia-internal:
+  xuan-internal:
     driver: bridge
     internal: true
-  folia-egress:
+  xuan-egress:
     driver: bridge
-  folia-sync:
+  xuan-sync:
     driver: bridge

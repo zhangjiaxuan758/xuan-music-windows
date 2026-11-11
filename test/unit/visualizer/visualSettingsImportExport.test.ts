@@ -173,9 +173,9 @@ describe('Visual Settings Import and Export', () => {
         songThemeAutoGenerateEnabled: true,
     };
 
-    it('correctly compresses a full config to a base64 theme code starting with folia-theme://', () => {
+    it('correctly compresses a full config to a base64 theme code starting with xuan-theme://', () => {
         const code = compressConfig(sampleConfig);
-        expect(code.startsWith('folia-theme://')).toBe(true);
+        expect(code.startsWith('xuan-theme://')).toBe(true);
 
         const decoded = decompressConfig(code);
         expect(decoded.visualizerMode).toBe('monet');
@@ -289,7 +289,7 @@ describe('Visual Settings Import and Export', () => {
 
     it('gracefully throws error on invalid configuration input strings', () => {
         expect(() => decompressConfig('invalid string')).toThrow();
-        expect(() => decompressConfig('folia-theme://invalidbase64@@')).toThrow();
+        expect(() => decompressConfig('xuan-theme://invalidbase64@@')).toThrow();
         expect(() => decompressConfig('{"invalid": "json"}')).toThrow();
     });
 });

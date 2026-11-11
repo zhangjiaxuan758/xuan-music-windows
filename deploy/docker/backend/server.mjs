@@ -14,17 +14,17 @@ app.use(express.json({ limit: '4mb' }));
 app.use(express.text({ type: ['text/*', 'application/xml'], limit: '4mb' }));
 
 app.get('/api/healthz', (_req, res) => {
-    res.json({ ok: true, service: 'folia-web-api' });
+    res.json({ ok: true, service: 'xuan-web-api' });
 });
 app.all('/api/generate-theme', generateTheme);
 app.all('/api/generate-theme_openai', generateOpenAiTheme);
 app.all('/api/lyric-proxy', lyricProxy);
 
 app.use((error, _req, res, _next) => {
-    console.error('[folia-web-api] Unhandled request error:', error);
+    console.error('[xuan-web-api] Unhandled request error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
 });
 
 app.listen(port, '0.0.0.0', () => {
-    console.log(`[folia-web-api] listening on 0.0.0.0:${port}`);
+    console.log(`[xuan-web-api] listening on 0.0.0.0:${port}`);
 });

@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **使用规范**：除非有明确需要跨 Provider 处理/调度能力或底层 API 直接交互的特定需求，否则所有前端 UI、Hooks 和业务 Store 对在线音乐服务的调用**必须通过 `omni` 进行**，严禁直接绕过 Omni 耦合具体 Provider 实现。
 
-`omni.ts` 是 Folia Major 在线音乐服务层的**统一网络接口与调度中枢**。它向上层 UI 界面、React Hooks 及 Store 暴露标准化的在线音乐操作 API，向下屏蔽具体的在线音乐服务提供商（Provider，如网易云音乐 `Netease`、酷狗音乐 `KuGou` 等）的实现细节与接口差异。
+`omni.ts` 是 Xuan Major 在线音乐服务层的**统一网络接口与调度中枢**。它向上层 UI 界面、React Hooks 及 Store 暴露标准化的在线音乐操作 API，向下屏蔽具体的在线音乐服务提供商（Provider，如网易云音乐 `Netease`、酷狗音乐 `KuGou` 等）的实现细节与接口差异。
 
 ---
 

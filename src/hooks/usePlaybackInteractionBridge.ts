@@ -189,7 +189,7 @@ export function usePlaybackInteractionBridge({
             }
 
             const hasBlockingWindow = () => Boolean(
-                document.querySelector('[data-folia-keyboard-window="true"]')
+                document.querySelector('[data-xuan-keyboard-window="true"]')
             );
 
             if (isDev && event.altKey && event.shiftKey && event.code === 'KeyD') {

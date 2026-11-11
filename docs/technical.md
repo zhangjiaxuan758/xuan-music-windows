@@ -1,13 +1,13 @@
-# Folia 技术与开发说明
+# Xuan 技术与开发说明
 
 这份文档收纳仓库 README 中较细的部署、开发、桌面端和技术栈说明。更完整的使用指南也可以访问专门的文档站点：
 
-- [Folia Guide](https://folia-site.cielaniska.top/guide/)
+- [Xuan Guide](https://xuan-site.cielaniska.top/guide/)
 - [Stage API 文档](../test/manual/stage-client/README.md)
 
 ## 桌面端说明
 
-桌面版内置前后端运行环境，适合希望即装即用的用户。最新版本请前往 [Releases 页面](https://github.com/zhangjiaxuan758/xuan-music/releases)。
+桌面版内置前后端运行环境，适合希望即装即用的用户。最新版本请前往 [Releases 页面](https://github.com/chthollyphile/xuan-major/releases)。
 
 ### 发布与更新通道
 
@@ -23,25 +23,25 @@ Cielo 的 `[canary]` 推送会更新滚动的 `cielo` prerelease，供 Cielo 通
 
 ### Linux 获取方式
 
-1. Arch Linux / Manjaro：通过 AUR 安装 `folia-major-bin`
+1. Arch Linux / Manjaro：通过 AUR 安装 `xuan-major-bin`
 
 ```bash
-yay -S folia-major-bin
+yay -S xuan-major-bin
 ```
 
 2. Debian / Ubuntu / Linux Mint：下载 `.deb`
 3. Fedora / RHEL / openSUSE：下载 `.rpm`
-4. 其他发行版：下载 `tar.gz`，解压后直接运行 `folia-major`
+4. 其他发行版：下载 `tar.gz`，解压后直接运行 `xuan-major`
 
 `tar.gz` 包中附带图标与 `.desktop` 模板，可按需手动创建桌面启动项。
 
 ### Hyprland / Wayland 遥控窗
 
-桌面端的外部遥控窗会作为主窗口的伴随窗口打开，并使用稳定窗口标题 `Folia Remote`。在 Hyprland 下，如果希望它以悬浮小窗方式出现，可以在 `hyprland.conf` 中添加类似规则：
+桌面端的外部遥控窗会作为主窗口的伴随窗口打开，并使用稳定窗口标题 `Xuan Remote`。在 Hyprland 下，如果希望它以悬浮小窗方式出现，可以在 `hyprland.conf` 中添加类似规则：
 
 ```ini
 windowrule {
-  name = folia-remote
+  name = xuan-remote
   float = on
   size = 520 315
   center = on
@@ -49,8 +49,8 @@ windowrule {
   no_blur = on
   border_size = 0
   no_shadow = on
-  match:class = ^(folia-major)$
-  match:title = ^(Folia Remote)$
+  match:class = ^(xuan-major)$
+  match:title = ^(Xuan Remote)$
 }
 
 ```
@@ -67,7 +67,7 @@ windowrule {
 
 ### AI 能力
 
-Folia 当前支持以下两类 AI 提供方式：
+Xuan 当前支持以下两类 AI 提供方式：
 
 - Google Gemini
 - OpenAI 兼容 API，例如 DeepSeek、ChatGPT 接口等
@@ -76,7 +76,7 @@ Gemini 通常更适合当前项目场景，因为 JSON 输出相对稳定。
 
 ### Stage API
 
-Folia 提供了从外部与播放器进行交互的 Stage API，从而可以实现外部程序与播放器的深度集成。可以通过 `npm run stage:client` 启动本地联调台，查看和测试这些接口的功能。
+Xuan 提供了从外部与播放器进行交互的 Stage API，从而可以实现外部程序与播放器的深度集成。可以通过 `npm run stage:client` 启动本地联调台，查看和测试这些接口的功能。
 
 具体可参考 [Stage API 文档](../test/manual/stage-client/README.md)。
 
@@ -84,7 +84,7 @@ Folia 提供了从外部与播放器进行交互的 Stage API，从而可以实�
 
 如果你希望快速上线 Web 版本，可以直接通过下方入口创建 Vercel 项目：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zhangjiaxuan758/xuan-music)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/chthollyphile/xuan-major)
 
 部署完成后，请在 Vercel 项目设置中补齐环境变量。
 
@@ -120,7 +120,7 @@ vercel env pull .env.local
 | --- | --- | --- |
 | `VITE_NETEASE_API_BASE` | 网易云音乐 API 实例地址 | 是 |
 | `VITE_KUGOU_API_BASE` | Web 版的 KuGouMusicApi 实例地址；Electron 不使用此项 | 否，默认留空 |
-| `VITE_FOLIA_API_BASE` | 自行托管的 Folia AI/歌词代理 API 根地址；Android 使用相关功能时必须为 HTTPS | 否，默认留空 |
+| `VITE_XUAN_API_BASE` | 自行托管的 Xuan AI/歌词代理 API 根地址；Android 使用相关功能时必须为 HTTPS | 否，默认留空 |
 | `VITE_AI_PROVIDER` | AI 提供商，`google` 或 `openai` | 是 |
 | `GEMINI_API_KEY` | Gemini API Key | 使用 Gemini 时需要 |
 | `OPENAI_API_KEY` | OpenAI 兼容 API Key | 使用 OpenAI兼容接口 时需要 |
@@ -135,14 +135,14 @@ Gemini 示例：
 ```env
 VITE_NETEASE_API_BASE=http://localhost:3000
 VITE_KUGOU_API_BASE=
-VITE_FOLIA_API_BASE=
+VITE_XUAN_API_BASE=
 VITE_AI_PROVIDER=google
 GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
 Web 版要使用酷狗时，需要自行部署 [KuGouMusicApi](https://github.com/MakcRe/KuGouMusicApi) 并填写 `VITE_KUGOU_API_BASE`。该变量没有默认公共实例；开发调试时可在 `.env.local` 中临时指向调试服务。Electron 版在主进程中直接调用内置的 KuGouMusicApi Node 模块，不会再启动一个酷狗 HTTP 服务。
 
-Electron 的酷狗登录与账号刷新日志位于 `%APPDATA%\Folia\logs\kugou-provider.log`。日志只记录请求阶段、状态、字段名和错误摘要，token、Cookie、userid、dfid 会被脱敏。
+Electron 的酷狗登录与账号刷新日志位于 `%APPDATA%\Xuan\logs\kugou-provider.log`。日志只记录请求阶段、状态、字段名和错误摘要，token、Cookie、userid、dfid 会被脱敏。
 
 OpenAI 兼容接口示例：
 
@@ -174,7 +174,7 @@ vercel dev
 
 ## Android（Capacitor 8）
 
-Android 应用位于仓库的 `android/`，内置 `dist/` 中的 Vite 产物；application ID 固定为 `top.izuna.foliamajor`，最低支持 Android 7 / API 24。Android 构建不会注册 PWA Service Worker，本地音乐入口因为不支持因此也会隐藏。
+Android 应用位于仓库的 `android/`，内置 `dist/` 中的 Vite 产物；application ID 固定为 `top.izuna.xuanmajor`，最低支持 Android 7 / API 24。Android 构建不会注册 PWA Service Worker，本地音乐入口因为不支持因此也会隐藏。
 
 ### 本地工具链
 
@@ -193,7 +193,7 @@ npm run cap:sync:android
 
 `cap:assets:android` 以 `android/img/icon.png`、`android/img/splash-light.png` 和 `android/img/splash-dark.png` 为唯一源图，重新生成 adaptive/round/legacy 图标及浅色、深色纵横屏启动图；源图不会被修改。
 
-`build:capacitor` 不再内置任何 API 地址。若要在 Android 中使用 AI 主题或歌词代理，请在 `.env.local` 中提供自行托管的 HTTPS `VITE_FOLIA_API_BASE`；不配置时这些功能会在运行时提示不可用。Web 未配置时仍使用同源 `/api/*`。AI Key 只能配置在你的服务端，禁止放入 `VITE_*`、APK 或 Android 日志。
+`build:capacitor` 不再内置任何 API 地址。若要在 Android 中使用 AI 主题或歌词代理，请在 `.env.local` 中提供自行托管的 HTTPS `VITE_XUAN_API_BASE`；不配置时这些功能会在运行时提示不可用。Web 未配置时仍使用同源 `/api/*`。AI Key 只能配置在你的服务端，禁止放入 `VITE_*`、APK 或 Android 日志。
 
 ### 构建与运行
 

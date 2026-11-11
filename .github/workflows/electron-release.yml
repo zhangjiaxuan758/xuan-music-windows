@@ -135,7 +135,7 @@ jobs:
         env:
           TARGET_VERSION: ${{ needs.validate-release.outputs.version }}
         run: |
-          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.foliaReleaseChannel='realeco'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
+          node -e "const fs=require('fs'); const pkg=require('./package.json'); pkg.version=process.env.TARGET_VERSION; pkg.xuanReleaseChannel='realeco'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
 
       - name: Generate release notes
         shell: bash
@@ -239,7 +239,7 @@ jobs:
 
       - name: Prepare AUR metadata
         if: steps.aur-secrets.outputs.configured == 'true'
-        run: ./packaging/aur/folia-major-bin/update.sh "${{ needs.validate-release.outputs.version }}"
+        run: ./packaging/aur/xuan-major-bin/update.sh "${{ needs.validate-release.outputs.version }}"
 
       - name: Set up SSH key
         if: steps.aur-secrets.outputs.configured == 'true'
@@ -263,16 +263,16 @@ jobs:
           RELEASE_VERSION: ${{ needs.validate-release.outputs.version }}
         run: |
           git clone "${AUR_REPO_SSH_URL}" aur-repo
-          cp packaging/aur/folia-major-bin/PKGBUILD aur-repo/PKGBUILD
-          cp packaging/aur/folia-major-bin/.SRCINFO aur-repo/.SRCINFO
-          cp packaging/aur/folia-major-bin/folia-major.desktop aur-repo/folia-major.desktop
-          cp packaging/aur/folia-major-bin/folia-major.png aur-repo/folia-major.png
+          cp packaging/aur/xuan-major-bin/PKGBUILD aur-repo/PKGBUILD
+          cp packaging/aur/xuan-major-bin/.SRCINFO aur-repo/.SRCINFO
+          cp packaging/aur/xuan-major-bin/xuan-major.desktop aur-repo/xuan-major.desktop
+          cp packaging/aur/xuan-major-bin/xuan-major.png aur-repo/xuan-major.png
           cd aur-repo
-          if git diff --quiet -- PKGBUILD .SRCINFO folia-major.desktop folia-major.png; then
+          if git diff --quiet -- PKGBUILD .SRCINFO xuan-major.desktop xuan-major.png; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add PKGBUILD .SRCINFO folia-major.desktop folia-major.png
+          git add PKGBUILD .SRCINFO xuan-major.desktop xuan-major.png
           git commit -m "Update to v${RELEASE_VERSION}"
           git push

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Style, StatusBar } from '@capacitor/status-bar';
 import { isCapacitorAndroid } from '../platform/runtime';
 
-// 当前文件：让 Android 系统栏跟随 Folia 明暗主题，并标记原生安全区环境。
+// 当前文件：让 Android 系统栏跟随 Xuan 明暗主题，并标记原生安全区环境。
 
 export const useCapacitorSystemBars = (isDaylight: boolean): void => {
   useEffect(() => {

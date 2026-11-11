@@ -28,7 +28,7 @@ function flattenLocale(obj: Record<string, any>, prefix = ''): Record<string, st
 const ZH_FALLBACKS: Record<string, string> = flattenLocale(zhCN);
 
 export type AppLanguagePreference = 'system' | 'en' | 'zh-CN' | 'zh-TW' | 'in';
-export const APP_LANGUAGE_STORAGE_KEY = 'folia_app_language';
+export const APP_LANGUAGE_STORAGE_KEY = 'xuan_app_language';
 
 const isSupportedManualLanguage = (value: string | null | undefined): value is Exclude<AppLanguagePreference, 'system'> => (
   value === 'en' || value === 'zh-CN' || value === 'zh-TW' || value === 'in'

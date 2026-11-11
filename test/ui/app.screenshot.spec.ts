@@ -219,7 +219,7 @@ async function installBaseState(
     localStorage.setItem('static_mode', 'true');
     localStorage.setItem('last_app_view', 'home');
     localStorage.setItem('last_home_view_tab', 'playlist');
-    localStorage.setItem('folia_last_seen_guide_version', '0.6.0');
+    localStorage.setItem('xuan_last_seen_guide_version', '0.6.0');
 
     if (payload.navidromeEnabled) {
       localStorage.setItem('navidrome_enabled', 'true');

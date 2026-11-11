@@ -1161,7 +1161,7 @@
     "monetGroupFiltersPostProcessing": "视觉增强与滤镜",
     "monetGroupColorTintWash": "叠色与水洗",
     "importExportTitle": "备份与导入",
-    "importExportDesc": "通过标准 JSON 或 folia-theme 文本导入/导出配色主题与歌词动画设置。",
+    "importExportDesc": "通过标准 JSON 或 xuan-theme 文本导入/导出配色主题与歌词动画设置。",
     "importPlaceholder": "在此处粘贴配置码、标准 JSON，或一条 OBS 链接...",
     "importBtn": "导入配置",
     "exportBtn": "复制配置码",
@@ -1708,6 +1708,6 @@
     "copyPromptTitle": "1. 复制 AI 提示词",
     "copyPromptDesc": "将提示词复制并粘贴到任意大模型对话中，生成主题 JSON 数据。",
     "importJsonTitle": "2. 粘贴并导入 JSON",
-    "prompt": "我正在使用 GitHub 上的 小轩音乐 音乐播放器，遇到了一个问题，需要你协助排查。\n\n小轩音乐 使用指南：{{guideUrl}}\n小轩音乐 源码仓库：{{repoUrl}}\n\n请把这些资料作为上下文，结合我接下来描述的问题，帮我判断可能原因并给出处理步骤。如果信息不足，请先询问我需要补充什么，不要直接做不确定的假设。"
+    "prompt": "我正在使用「小轩音乐」音乐播放器，遇到了一个问题，需要你协助排查。\n\n小轩音乐 使用指南：{{guideUrl}}\n\n请把这些资料作为上下文，结合我接下来描述的问题，帮我判断可能原因并给出处理步骤。如果信息不足，请先询问我需要补充什么，不要直接做不确定的假设。"
   }
 } as const;

@@ -120,9 +120,9 @@ describe('buildObsAppearanceFromShortcode', () => {
 
 describe('parseObsWebParams', () => {
     it('reads host/cfg/daylight/transparent/visualizer with OBS defaults', () => {
-        const p = parseObsWebParams('?host=localhost%3A9863&cfg=folia-theme%3A%2F%2Fabc&daylight=1&visualizer=cadenza');
+        const p = parseObsWebParams('?host=localhost%3A9863&cfg=xuan-theme%3A%2F%2Fabc&daylight=1&visualizer=cadenza');
         expect(p.host).toBe('localhost:9863');
-        expect(p.cfg).toBe('folia-theme://abc');
+        expect(p.cfg).toBe('xuan-theme://abc');
         expect(p.isDaylight).toBe(true);
         expect(p.transparent).toBe(false); // 缺省=显示背景
         expect(p.visualizer).toBe('cadenza');
@@ -168,29 +168,29 @@ describe('parseObsAiParams', () => {
 
 describe('extractCfgFromInput', () => {
     it('pulls cfg out of a full OBS URL', () => {
-        const url = 'https://example.test/?obs=1&obsSource=now-playing&host=localhost%3A9863&cfg=folia-theme%3A%2F%2Fabc123';
-        expect(extractCfgFromInput(url)).toBe('folia-theme://abc123');
+        const url = 'https://example.test/?obs=1&obsSource=now-playing&host=localhost%3A9863&cfg=xuan-theme%3A%2F%2Fabc123';
+        expect(extractCfgFromInput(url)).toBe('xuan-theme://abc123');
     });
 
     it('passes through a bare shortcode or raw JSON', () => {
-        expect(extractCfgFromInput('folia-theme://abc')).toBe('folia-theme://abc');
+        expect(extractCfgFromInput('xuan-theme://abc')).toBe('xuan-theme://abc');
         expect(extractCfgFromInput('  {"visualizerMode":"monet"}  ')).toBe('{"visualizerMode":"monet"}');
     });
 });
 
 describe('buildObsSourceUrl', () => {
     it('bakes source + host + cfg into the query', () => {
-        const url = buildObsSourceUrl('now-playing', 'folia-theme://abc', 'localhost:9863');
+        const url = buildObsSourceUrl('now-playing', 'xuan-theme://abc', 'localhost:9863');
         expect(url).toContain('obs=1');
         expect(url).toContain('obsSource=now-playing');
         expect(url).toContain('host=localhost%3A9863');
-        expect(url).toContain('cfg=folia-theme');
+        expect(url).toContain('cfg=xuan-theme');
         // round-trip：从组装的 URL 再剥回 cfg。
-        expect(extractCfgFromInput(url.startsWith('http') ? url : `https://x.test${url}`)).toBe('folia-theme://abc');
+        expect(extractCfgFromInput(url.startsWith('http') ? url : `https://x.test${url}`)).toBe('xuan-theme://abc');
     });
 
     it('carries extra params (daylight/transparent) ahead of the terminal cfg', () => {
-        const url = buildObsSourceUrl('now-playing', 'folia-theme://abc', '', { daylight: '1', transparent: '0' });
+        const url = buildObsSourceUrl('now-playing', 'xuan-theme://abc', '', { daylight: '1', transparent: '0' });
         expect(url).toContain('daylight=1');
         expect(url).toContain('transparent=0');
         // cfg stays last so trailing technical params never wrap the copied link.
@@ -198,7 +198,7 @@ describe('buildObsSourceUrl', () => {
     });
 
     it('keeps the long cfg blob last, after source-specific extra params', () => {
-        const url = buildObsSourceUrl('playercap', 'folia-theme://abc', 'lan:8765', { nxpcPlayer: 'cloudmusicv3', nxpcBasis: 'timestamp' });
+        const url = buildObsSourceUrl('playercap', 'xuan-theme://abc', 'lan:8765', { nxpcPlayer: 'cloudmusicv3', nxpcBasis: 'timestamp' });
         // cfg always comes last; technical params (host/nxpcPlayer/nxpcBasis) go up front for readability.
         expect(url.indexOf('cfg=')).toBeGreaterThan(url.indexOf('nxpcPlayer='));
         expect(url.indexOf('cfg=')).toBeGreaterThan(url.indexOf('nxpcBasis='));
@@ -206,6 +206,6 @@ describe('buildObsSourceUrl', () => {
         // cfg is the final segment: no &param follows it (guaranteed structurally, not by convention).
         expect(url.slice(url.indexOf('cfg=')).includes('&')).toBe(false);
         // order-independent parsing can still unwrap cfg.
-        expect(extractCfgFromInput(`https://x.test${url}`)).toBe('folia-theme://abc');
+        expect(extractCfgFromInput(`https://x.test${url}`)).toBe('xuan-theme://abc');
     });
 });

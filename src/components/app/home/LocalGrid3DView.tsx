@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FolderOpen, Loader2, Music, ListMusic, User, Disc3, RefreshCw } from 'lucide-react';
-import DesktopGrid3DSurface, { DesktopGrid3DAction } from '../../folia-grid/DesktopGrid3DSurface';
+import DesktopGrid3DSurface, { DesktopGrid3DAction } from '../../xuan-grid/DesktopGrid3DSurface';
 import { LocalLibraryGroup, LocalPlaylist, LocalSong, Theme } from '../../../types';
 import { GridViewCollectionDescriptor, createLocalGridViewCollection } from './gridViewCollectionAdapters';
 import { buildLocalGrid3DGroups } from './localGrid3DModel';

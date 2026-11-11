@@ -16,7 +16,7 @@ import { SongResult, LocalSong, LocalPlaylist, LocalLibraryGroup, Theme, PlayerS
 import { getNavidromeConfig, navidromeApi } from '../services/navidromeService';
 import LocalGrid3DView from './app/home/LocalGrid3DView';
 import NavidromeGrid3DView from './app/home/NavidromeGrid3DView';
-import DesktopGrid3DSurface from './folia-grid/DesktopGrid3DSurface';
+import DesktopGrid3DSurface from './xuan-grid/DesktopGrid3DSurface';
 import {
     createOnlineGridViewCollection,
     getProviderCollectionArtistLabel,
@@ -582,8 +582,8 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
         const handleRefreshAlbums = () => {
             void fetchFavoriteAlbumsRef.current();
         };
-        window.addEventListener('folia-refresh-favorite-albums', handleRefreshAlbums);
-        return () => window.removeEventListener('folia-refresh-favorite-albums', handleRefreshAlbums);
+        window.addEventListener('xuan-refresh-favorite-albums', handleRefreshAlbums);
+        return () => window.removeEventListener('xuan-refresh-favorite-albums', handleRefreshAlbums);
     }, []);
 
     const fetchRadioItems = async () => {

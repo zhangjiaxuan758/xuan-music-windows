@@ -1,9 +1,9 @@
 /// <reference types="vite/client" />
 
 declare global {
-  // 当前文件：Folia 构建常量、Vite 环境变量与宿主桥接类型声明。
+  // 当前文件：Xuan 构建常量、Vite 环境变量与宿主桥接类型声明。
   interface ImportMetaEnv {
-    readonly VITE_FOLIA_API_BASE?: string;
+    readonly VITE_XUAN_API_BASE?: string;
   }
 
   interface ImportMeta {
@@ -18,7 +18,7 @@ declare global {
   const __DOCKER_STACK_VERSION__: string;
 
   interface Window {
-    __FOLIA_RUNTIME_CONFIG__?: {
+    __XUAN_RUNTIME_CONFIG__?: {
       aiProvider?: 'gemini' | 'openai';
     };
   }

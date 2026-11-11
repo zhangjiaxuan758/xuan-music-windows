@@ -9,7 +9,7 @@ describe('sync archive', () => {
     it('round-trips a multi-file sync zip export', async () => {
         const exportedAt = '2026-07-08T00:00:00.000Z';
         const bundle: SyncLibraryExportBundle = {
-            kind: 'folia-sync-export',
+            kind: 'xuan-sync-export',
             schemaVersion: SYNC_SCHEMA_VERSION,
             exportedAt,
             settings: null,
@@ -25,10 +25,10 @@ describe('sync archive', () => {
         };
 
         const blob = createSyncLibraryZipBlob(bundle);
-        const file = new File([blob], 'folia-sync.zip', { type: 'application/zip' });
+        const file = new File([blob], 'xuan-sync.zip', { type: 'application/zip' });
         const parsed = await readSyncLibraryZipFile(file);
 
-        expect(parsed.kind).toBe('folia-sync-export');
+        expect(parsed.kind).toBe('xuan-sync-export');
         expect(parsed.exportedAt).toBe(exportedAt);
         expect(parsed.themes).toHaveLength(1);
         expect(parsed.themes[0].fingerprint).toBe('netease:id:123');

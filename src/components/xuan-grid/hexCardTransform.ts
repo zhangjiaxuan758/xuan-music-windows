@@ -1,6 +1,6 @@
 import type { HexGridCoord } from './hexViewport';
 
-// Computes and applies frame-local styles for draggable folia hex card wrappers.
+// Computes and applies frame-local styles for draggable xuan hex card wrappers.
 export type HexCardPointerEvents = 'auto' | 'none';
 
 export interface HexCardFrameOptions {

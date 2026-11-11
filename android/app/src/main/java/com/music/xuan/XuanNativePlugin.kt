@@ -272,6 +272,20 @@ class XuanNativePlugin : Plugin() {
         }
     }
 
+    /** 返回 APK 真实版本号（PackageManager 读取，非构建注入）：更新比对以它为准 */
+    @PluginMethod
+    fun getApkVersion(call: PluginCall) {
+        try {
+            val pi = context.packageManager.getPackageInfo(context.packageName, 0)
+            call.resolve(JSObject().apply {
+                put("versionCode", if (android.os.Build.VERSION.SDK_INT >= 28) pi.longVersionCode.toInt() else pi.versionCode)
+                put("versionName", pi.versionName ?: "")
+            })
+        } catch (e: Exception) {
+            call.reject("version failed: ${e.message}")
+        }
+    }
+
     /** 设备支持的帧率档位（取整去重升序，如 [30, 60, 90, 120]） */
     @PluginMethod
     fun getSupportedFrameRates(call: PluginCall) {

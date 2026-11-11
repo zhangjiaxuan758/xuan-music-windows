@@ -6,7 +6,7 @@ import { Theme } from '../../types';
 import { Grid3DSlider, Grid3DSliderItem } from './Grid3DSlider';
 import { ChevronDown } from 'lucide-react';
 
-// src/components/folia-grid/DesktopGrid3DSurface.tsx
+// src/components/xuan-grid/DesktopGrid3DSurface.tsx
 // Shared desktop home surface that keeps Grid3D slider and GridMap controls visually consistent.
 
 export interface DesktopGrid3DAction {

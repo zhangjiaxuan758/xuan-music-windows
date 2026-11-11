@@ -2,7 +2,7 @@ import type { DualTheme, SubtitleContentMode, Theme, VisualizerBackgroundMode, V
 import type { VisualizerTuningBundle } from '../../components/visualizer/tuningRegistry';
 
 // src/services/sync/syncTypes.ts
-// Shared contracts for Folia's user-hosted sync server API.
+// Shared contracts for Xuan's user-hosted sync server API.
 
 export const SYNC_SCHEMA_VERSION = 1;
 export const SYNC_PROVIDER = 'sync-server' as const;
@@ -103,7 +103,7 @@ export type WorkerHealthResponse = {
 };
 
 export type SyncLibraryExportBundle = {
-    kind: 'folia-sync-export';
+    kind: 'xuan-sync-export';
     schemaVersion: number;
     exportedAt: string;
     settings: SyncedSettingsRecord | null;

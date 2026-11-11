@@ -1115,7 +1115,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={shellTransition}
-            data-folia-keyboard-window="true"
+            data-xuan-keyboard-window="true"
             className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 sm:px-5 sm:py-12"
             style={{ backgroundColor: overlayBackground }}
             onMouseDown={handleOverlayMouseDown}
@@ -1271,14 +1271,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                                 {t('help.madeBy') || "Made by"}
                                             </button>{' '}
                                             <span className="opacity-70">小轩音乐 {__APP_VERSION__} · com.music.xuan</span>
-                                            <a
-                                                href="https://github.com/zhangjiaxuan758/xuan-music"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="ml-2 underline opacity-70 hover:opacity-100"
-                                            >
-                                                源码仓库：xuan-music
-                                            </a>
                                         </p>
                                     </div>
                                     <div className="flex flex-col items-center gap-2 mt-6 mb-2 text-xs font-mono text-center">

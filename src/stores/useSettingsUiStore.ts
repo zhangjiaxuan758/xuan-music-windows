@@ -31,9 +31,9 @@ import {
 // Shared settings state and actions used by App, Home, and SettingsModal.
 
 export type StatusSetter = React.Dispatch<React.SetStateAction<StatusMessage | null>>;
-export const CACHE_SIZE_KEY = 'folia_cache_size';
+export const CACHE_SIZE_KEY = 'xuan_cache_size';
 const ENABLE_MEDIA_CACHE_KEY = 'xuan_enable_media_cache';
-const LAST_SEEN_GUIDE_VERSION_STORAGE_KEY = 'folia_last_seen_guide_version';
+const LAST_SEEN_GUIDE_VERSION_STORAGE_KEY = 'xuan_last_seen_guide_version';
 
 export type AudioQuality = AudioQualityPreference;
 export type SettingsModalInitialTab = 'help' | 'options';

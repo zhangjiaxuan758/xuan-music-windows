@@ -13,7 +13,7 @@ test('switches between clouds and corridor mode and keeps particle controls inte
         localStorage.setItem('i18nextLng', 'en');
         localStorage.setItem('visualizer_mode', 'diorama');
         localStorage.setItem('static_mode', 'true');
-        localStorage.setItem('folia_last_seen_guide_version', '0.5.27');
+        localStorage.setItem('xuan_last_seen_guide_version', '0.5.27');
     });
     await page.route('**/__mock_netease__/**', async (route) => {
         await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });

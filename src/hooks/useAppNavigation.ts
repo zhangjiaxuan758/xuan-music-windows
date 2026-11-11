@@ -79,7 +79,7 @@ const getCollectionHash = (collection: GridViewCollectionDescriptor) => (
     `#collection/${collection.source}/${collection.type}/${encodeURIComponent(String(collection.id))}`
 );
 
-const LOCAL_MUSIC_LAST_ROW_KEY = 'folia_local_music_last_row';
+const LOCAL_MUSIC_LAST_ROW_KEY = 'xuan_local_music_last_row';
 
 export function useAppNavigation() {
     const [currentView, setCurrentView] = useState<ViewState>('home');

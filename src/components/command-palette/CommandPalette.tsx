@@ -180,7 +180,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
         <AnimatePresence>
             {isOpen && (
                 <motion.div
-                    data-folia-keyboard-window="true"
+                    data-xuan-keyboard-window="true"
                     className="fixed inset-0 z-[150] flex items-start justify-center px-4 pt-[18vh] backdrop-blur-md"
                     style={{ backgroundColor: isDaylight ? 'rgba(250,250,249,0.46)' : 'rgba(0,0,0,0.48)' }}
                     initial={{ opacity: 0 }}
@@ -262,7 +262,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                                 autoCorrect="off"
                                 autoCapitalize="none"
                                 spellCheck={false}
-                                name="folia-command-palette-query"
+                                name="xuan-command-palette-query"
                                 role="combobox"
                                 aria-autocomplete="list"
                                 aria-expanded={matches.length > 0}

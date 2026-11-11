@@ -1,7 +1,7 @@
 {
-  "name": "folia-sync-server",
+  "name": "xuan-sync-server",
   "version": "1.0.0",
-  "description": "Sync Server for Folia",
+  "description": "Sync Server for Xuan",
   "private": true,
   "type": "module",
   "engines": {

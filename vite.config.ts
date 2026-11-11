@@ -67,7 +67,7 @@ function readDevRequestBody(req: import('http').IncomingMessage): Promise<Uint8A
 
 function devLyricProxyPlugin() {
   return {
-    name: 'folia-dev-lyric-proxy',
+    name: 'xuan-dev-lyric-proxy',
     apply: 'serve' as const,
     configureServer(server: ViteDevServer) {
       server.middlewares.use(async (req, res, next) => {
@@ -137,7 +137,7 @@ function devLyricProxyPlugin() {
 }
 
 export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig> {
-  const isCapacitorBuild = process.env.FOLIA_BUILD_TARGET === 'capacitor';
+  const isCapacitorBuild = process.env.XUAN_BUILD_TARGET === 'capacitor';
   let commitHash = '';
   if (process.env.VERCEL_GIT_COMMIT_SHA) {
     commitHash = process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 7);

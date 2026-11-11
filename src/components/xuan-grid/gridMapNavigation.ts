@@ -1,4 +1,4 @@
-// src/components/folia-grid/gridMapNavigation.ts
+// src/components/xuan-grid/gridMapNavigation.ts
 // Keeps GridMap selections aligned with the source Grid3D collection after filtering or data refreshes.
 
 export interface GridMapNavigableItem {

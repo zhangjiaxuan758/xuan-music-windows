@@ -11,7 +11,7 @@ import { detectTimedLyricFormat } from '../formatDetection';
 import { qrcDecrypt } from './qrcDecrypt';
 import { applyDetectedChorusEffects, applyNeteaseChorusByTime } from '../chorusEffects';
 import type { NeteaseChorusRange } from '../chorusEffects';
-import { resolveFoliaApiUrl } from '../../../services/webApi';
+import { resolveXuanApiUrl } from '../../../services/webApi';
 
 const isElectron = typeof window !== 'undefined' && (window as any).electron;
 
@@ -40,7 +40,7 @@ async function requestQQ(method: string, module: string, param: any): Promise<an
   };
 
   const targetUrl = 'https://u.y.qq.com/cgi-bin/musicu.fcg';
-  const url = isElectron ? targetUrl : resolveFoliaApiUrl(`lyric-proxy?url=${encodeURIComponent(targetUrl)}`);
+  const url = isElectron ? targetUrl : resolveXuanApiUrl(`lyric-proxy?url=${encodeURIComponent(targetUrl)}`);
 
   const response = await fetch(url, {
     method: 'POST',

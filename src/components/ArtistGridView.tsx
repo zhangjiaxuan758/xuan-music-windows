@@ -12,13 +12,13 @@ import { getSizedCoverUrl } from '../utils/coverUrl';
 import { getSongCoverUrl } from '../services/onlineMusic/songMetadata';
 import { createSafeObjectUrl, getBlobObjectUrlSignature, isBlob } from '../utils/blobGuards';
 import { PolaroidCard } from './GridView';
-import { HexGridCoord, CubeCoord, getHexCubicSpiral } from './folia-grid/hexViewport';
-import { useFoliaHexViewport } from './folia-grid/useFoliaHexViewport';
+import { HexGridCoord, CubeCoord, getHexCubicSpiral } from './xuan-grid/hexViewport';
+import { useXuanHexViewport } from './xuan-grid/useXuanHexViewport';
 import { CollectionListItem, SidePanelList } from './shared/SidePanelList';
 import { GridListSearchButton } from './shared/GridListSearchButton';
 import { gridSearchPanelMotion } from './shared/gridSearchPanelMotion';
-import { appendUniqueByKey, deriveProgressiveLoadingState } from './folia-grid/progressiveGrid';
-import { useProgressiveItemEntrance } from './folia-grid/useProgressiveItemEntrance';
+import { appendUniqueByKey, deriveProgressiveLoadingState } from './xuan-grid/progressiveGrid';
+import { useProgressiveItemEntrance } from './xuan-grid/useProgressiveItemEntrance';
 import { useLocalLibraryCatalog } from '../hooks/useLocalLibraryCatalog';
 import { buildLocalLibraryIndex, followEntityRedirect } from '../utils/localLibraryIndex';
 import { ArtistGridInfoCutInPanel } from './artist-grid/ArtistGridInfoCutInPanel';
@@ -72,7 +72,7 @@ type StoredArtistGridNavigationState = {
     searchQuery: string;
 };
 
-const ARTIST_GRID_NAVIGATION_PREFIX = 'folia_artist_grid_state';
+const ARTIST_GRID_NAVIGATION_PREFIX = 'xuan_artist_grid_state';
 
 // Custom coordinate generator for Artist Grid
 // Computes baseX/baseY for hexagons, reserving specific spots for Avatar and Bio.
@@ -707,7 +707,7 @@ const ArtistGridView: React.FC<ArtistGridViewProps> = ({
         renderedIndexes,
         renderedIndexesRef,
         updateRenderedIndexesForViewport,
-    } = useFoliaHexViewport({
+    } = useXuanHexViewport({
         itemCount: gridItems.length,
         spacingX: layoutConfig.spacingX,
         spacingY: layoutConfig.spacingY,

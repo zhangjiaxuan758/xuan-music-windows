@@ -3,7 +3,7 @@ import { Disc } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSettingsUiStore } from '../../stores/useSettingsUiStore';
 
-// src/components/folia-grid/Grid3DSlider.tsx
+// src/components/xuan-grid/Grid3DSlider.tsx
 // Controlled desktop Grid3D slider shared by Netease, local music, and Navidrome overview surfaces.
 
 export interface Grid3DSliderItem {

@@ -1,7 +1,7 @@
 import type { SongResult } from '../../types';
 import { isSongUnavailable } from '../../services/onlineMusic/songAvailability';
 
-// src/components/folia-grid/gridViewContextActions.ts
+// src/components/xuan-grid/gridViewContextActions.ts
 
 export type GridViewContextItem = {
     rawTrack?: SongResult;

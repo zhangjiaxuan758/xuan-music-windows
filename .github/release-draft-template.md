@@ -1,9 +1,9 @@
 ## 下载说明
 
-- Windows：下载 `Folia-Setup-<version>.exe`
+- Windows：下载 `Xuan-Setup-<version>.exe`
 - macOS：
-  - Apple Silicon：下载 `Folia-<version>-arm64.dmg`
-  - Intel Mac：下载 `Folia-<version>-x64.dmg`
+  - Apple Silicon：下载 `Xuan-<version>-arm64.dmg`
+  - Intel Mac：下载 `Xuan-<version>-x64.dmg`
   - 如果打开时提示“应用已损坏”，这通常是当前 macOS 包未签名 / 未 notarize 导致的 Gatekeeper 拦截，不是安装包本身损坏。解决方法见[这份说明]({{MACOS_UNSIGNED_HELP_URL}})
 
 如果国内网络从 GitHub Releases 下载较慢，可以使用 [网盘链接](https://pan.quark.cn/s/6e4c6fa3bc6f) 下载。网盘链接仅提供 Windows 与 Apple silicon 的正式版安装包.

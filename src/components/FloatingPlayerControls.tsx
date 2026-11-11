@@ -115,7 +115,7 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
             if (target instanceof Element) {
                 if (target.closest('[data-xuan-timeline]')) return;
                 // 其它全屏浮层（设置 / 帮助等）也不该把控件收掉
-                if (target.closest('[data-folia-keyboard-window]')) return;
+                if (target.closest('[data-xuan-keyboard-window]')) return;
             }
             setIsHovered(false);
         };

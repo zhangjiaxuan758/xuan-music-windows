@@ -15,8 +15,8 @@ type FrameRateLimitedRaf = {
 };
 
 type WindowWithVisualizerFrameRateLimiter = Window & {
-    __foliaNativeRequestAnimationFrame?: RequestAnimationFrameFn;
-    __foliaNativeCancelAnimationFrame?: CancelAnimationFrameFn;
+    __xuanNativeRequestAnimationFrame?: RequestAnimationFrameFn;
+    __xuanNativeCancelAnimationFrame?: CancelAnimationFrameFn;
 };
 
 export const VISUALIZER_FRAME_RATE_OPTIONS = [60, 90, 120] as const satisfies VisualizerFrameRate[];
@@ -154,11 +154,11 @@ export const restoreGlobalVisualizerFrameRateLimiter = () => {
     }
 
     const frameWindow = window as WindowWithVisualizerFrameRateLimiter;
-    if (frameWindow.__foliaNativeRequestAnimationFrame) {
-        window.requestAnimationFrame = frameWindow.__foliaNativeRequestAnimationFrame;
+    if (frameWindow.__xuanNativeRequestAnimationFrame) {
+        window.requestAnimationFrame = frameWindow.__xuanNativeRequestAnimationFrame;
     }
-    if (frameWindow.__foliaNativeCancelAnimationFrame) {
-        window.cancelAnimationFrame = frameWindow.__foliaNativeCancelAnimationFrame;
+    if (frameWindow.__xuanNativeCancelAnimationFrame) {
+        window.cancelAnimationFrame = frameWindow.__xuanNativeCancelAnimationFrame;
     }
     installedLimiter = null;
 };
@@ -181,13 +181,13 @@ export const installGlobalVisualizerFrameRateLimiter = (overrideFrameRate?: Visu
     }
 
     const frameWindow = window as WindowWithVisualizerFrameRateLimiter;
-    frameWindow.__foliaNativeRequestAnimationFrame ??= window.requestAnimationFrame;
-    frameWindow.__foliaNativeCancelAnimationFrame ??= window.cancelAnimationFrame;
+    frameWindow.__xuanNativeRequestAnimationFrame ??= window.requestAnimationFrame;
+    frameWindow.__xuanNativeCancelAnimationFrame ??= window.cancelAnimationFrame;
     const nativeRequestAnimationFrame: RequestAnimationFrameFn = (callback) => (
-        frameWindow.__foliaNativeRequestAnimationFrame?.call(window, callback) ?? 0
+        frameWindow.__xuanNativeRequestAnimationFrame?.call(window, callback) ?? 0
     );
     const nativeCancelAnimationFrame: CancelAnimationFrameFn = (handle) => {
-        frameWindow.__foliaNativeCancelAnimationFrame?.call(window, handle);
+        frameWindow.__xuanNativeCancelAnimationFrame?.call(window, handle);
     };
     installedLimiter = createFrameRateLimitedRaf(nativeRequestAnimationFrame, nativeCancelAnimationFrame, initialFrameRate);
 

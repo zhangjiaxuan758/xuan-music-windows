@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Folia Noto Serif SC';
+  font-family: 'Xuan Noto Serif SC';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -9,7 +9,7 @@
 }
 
 @font-face {
-  font-family: 'Folia Noto Serif SC';
+  font-family: 'Xuan Noto Serif SC';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -42,19 +42,19 @@ textarea,
   --scrollbar-track: #18181b;
   --scrollbar-thumb: #3f3f46;
   --scrollbar-thumb-hover: #52525b;
-  --folia-safe-area-top: env(safe-area-inset-top, 0px);
-  --folia-safe-area-right: env(safe-area-inset-right, 0px);
-  --folia-safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --folia-safe-area-left: env(safe-area-inset-left, 0px);
+  --xuan-safe-area-top: env(safe-area-inset-top, 0px);
+  --xuan-safe-area-right: env(safe-area-inset-right, 0px);
+  --xuan-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --xuan-safe-area-left: env(safe-area-inset-left, 0px);
 }
 
 /* 原生层已隐藏全部系统栏并铺满挖孔区，Web 层不再保留安全区留白，
    否则横屏时摄像头一侧会出现黑边，且全屏容器会被缩小导致内部无法滚动。 */
 html[data-runtime='capacitor-android'] {
-  --folia-safe-area-top: 0px;
-  --folia-safe-area-right: 0px;
-  --folia-safe-area-bottom: 0px;
-  --folia-safe-area-left: 0px;
+  --xuan-safe-area-top: 0px;
+  --xuan-safe-area-right: 0px;
+  --xuan-safe-area-bottom: 0px;
+  --xuan-safe-area-left: 0px;
 }
 
 html[data-runtime='capacitor-android'] .fixed.inset-0 {

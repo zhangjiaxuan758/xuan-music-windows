@@ -1,6 +1,6 @@
 // 小轩音乐：直连网易云官方服务器（music.163.com / eapi）。
 // 不注入任何界面元素，也不需要用户填写任何地址；装上点「登录」即可扫码。
-window.__FOLIA_RUNTIME_CONFIG__ = window.__FOLIA_RUNTIME_CONFIG__ || {};
+window.__XUAN_RUNTIME_CONFIG__ = window.__XUAN_RUNTIME_CONFIG__ || {};
 
 (function () {
   'use strict';

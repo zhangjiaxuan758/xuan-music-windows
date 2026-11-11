@@ -6,7 +6,7 @@ import { UserGuideFeatureCard } from './UserGuideFeatureCard';
 import { UserGuideTipCard } from './UserGuideTipCard';
 import type { GuidePage } from './userGuideContent';
 import { NewFeaturesIntro } from './NewFeaturesIntro';
-import foliaIcon from '../../../build/icon.png';
+import xuanIcon from '../../../build/icon.png';
 
 // src/components/modal/UserGuidePageContent.tsx
 // 小轩音乐是 Android 横屏应用：使用指南只保留触屏与登录相关说明，
@@ -219,7 +219,7 @@ export const UserGuidePageContent: React.FC<UserGuidePageContentProps> = ({
     return (
         <div className="flex flex-col items-center justify-center min-h-[240px] py-6 text-center">
             <div className={`w-28 h-28 rounded-[1.75rem] overflow-hidden ${isDaylight ? 'bg-black/[0.03]' : 'bg-white/5'} border ${isDaylight ? 'border-black/10' : 'border-white/10'} flex items-center justify-center mb-5 shadow-lg`}>
-                <img src={foliaIcon} alt="小轩音乐" className="w-full h-full object-cover" />
+                <img src={xuanIcon} alt="小轩音乐" className="w-full h-full object-cover" />
             </div>
             <h2 className={`text-3xl font-bold mb-3 ${textPrimary}`}>
                 {t('userGuide.ready.title', '准备就绪')}

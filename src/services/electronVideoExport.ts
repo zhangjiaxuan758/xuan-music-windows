@@ -36,7 +36,7 @@ export const buildDefaultVideoExportFileName = (
     preset: VideoExportPreset,
     extension: VideoExportFileExtension,
 ) => {
-    const title = song.name?.trim() || 'folia-export';
+    const title = song.name?.trim() || 'xuan-export';
     return `${title}-${preset.width}x${preset.height}.${extension}`;
 };
 
@@ -90,7 +90,7 @@ export const stopMediaStream = (stream: MediaStream | null) => {
 // Forces the captured player document to stop painting cursor shapes during export.
 export const installVideoExportCursorGuard = () => {
     const style = document.createElement('style');
-    style.dataset.foliaVideoExportCursorGuard = 'true';
+    style.dataset.xuanVideoExportCursorGuard = 'true';
     style.textContent = 'html, body, body * { cursor: none !important; }';
     document.head.appendChild(style);
 

@@ -29,8 +29,8 @@ dist-ssr
 dev-dist/
 example/
 release/
-packaging/aur/folia-major-bin/FIRST_RELEASE.md
-packaging/aur/folia-major-bin/README.md
+packaging/aur/xuan-major-bin/FIRST_RELEASE.md
+packaging/aur/xuan-major-bin/README.md
 .codex
 .codex-tmp
 .wrangler/tmp
@@ -54,23 +54,3 @@ commit.md
 scripts/*
 !scripts/generate-android-assets.mjs
 docs/TODO.md
-
-
-# 小轩音乐：签名密钥 / 含密码的说明 / 本地环境 / 构建产物 一律不入库
-*.jks
-*.keystore
-*.p12
-*.pem
-*.key
-签名信息.txt
-.env
-.env.*
-!.env.example
-android/app/build/
-android/build/
-android/.gradle/
-android/app/src/main/assets/public/
-dist/
-build/
-*.apk
-*.aab

@@ -49,7 +49,7 @@ description: Use when the user refers to repository-specific terms such as home 
   -> overlay host: `src/components/app/home/GridViewOverlayHost.tsx`
 
 - “隐藏歌单”“歌单隐藏过滤”
-  -> `isPlaylistHidden` / `hiddenPlaylistKeys` in `src/components/Grid3D.tsx`, `src/components/GridMap.tsx`, `src/components/folia-grid/DesktopGrid3DSurface.tsx`
+  -> `isPlaylistHidden` / `hiddenPlaylistKeys` in `src/components/Grid3D.tsx`, `src/components/GridMap.tsx`, `src/components/xuan-grid/DesktopGrid3DSurface.tsx`
 
 - “文件夹排序”“本地排序策略”
   -> `localFolderSortStrategy` in `src/components/GridView.tsx`

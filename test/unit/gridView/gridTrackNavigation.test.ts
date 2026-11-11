@@ -5,7 +5,7 @@ import { buildNavidromeQueue } from '../../../src/services/playbackAdapters';
 import {
     resolveGridTrackAlbumTargetId,
     resolveGridTrackArtistTargetId,
-} from '../../../src/components/folia-grid/gridTrackNavigation';
+} from '../../../src/components/xuan-grid/gridTrackNavigation';
 
 // Locks GridView links to source identities instead of display-only metadata IDs.
 

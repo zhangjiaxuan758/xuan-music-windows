@@ -1,5 +1,5 @@
 {
-  "name": "folia-docker-kugou-api",
+  "name": "xuan-docker-kugou-api",
   "private": true,
   "version": "1.0.0",
   "dependencies": {

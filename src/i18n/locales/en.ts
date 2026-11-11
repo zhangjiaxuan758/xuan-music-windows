@@ -1701,6 +1701,6 @@
     "copyPromptTitle": "1. Copy AI Prompt",
     "copyPromptDesc": "Copy the prompt and paste it into any AI model to generate your theme.",
     "importJsonTitle": "2. Paste JSON Result",
-    "prompt": "I am using the 小轩音乐 music player on GitHub and need help with a problem.\n\n小轩音乐 Guide: {{guideUrl}}\n小轩音乐 repository: {{repoUrl}}\n\nPlease use these references as context, then help me understand and solve the problem I describe next. If any information is missing, ask what I should provide before making uncertain assumptions."
+    "prompt": "I am using the 小轩音乐 music player and need help with a problem.\n\n小轩音乐 Guide: {{guideUrl}}\n\nPlease use these references as context, then help me understand and solve the problem I describe next. If any information is missing, ask what I should provide before making uncertain assumptions."
   }
 } as const;
