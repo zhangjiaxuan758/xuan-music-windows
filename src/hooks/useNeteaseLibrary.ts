@@ -255,6 +255,44 @@ export function useNeteaseLibrary({
         void refreshUserData(user.id);
     }, [isUserDataReady, refreshUserData, user]);
 
+    // 账号数据实时同步：轻量轮询登录态 profile（会员/昵称/头像等），有变化立即更新，
+    // 无需手动点「同步数据」——例如刚开通/失去会员，播放页音质档与主页徽标自动跟上。
+    // 「同步数据」按钮保留，用于歌单/收藏/云盘等全量同步。
+    useEffect(() => {
+        if (!isUserDataReady || !user) return;
+        let disposed = false;
+        const profileKeyOf = (p: ProviderUser | null) =>
+            p ? [p.id, Number((p as { vipType?: number })?.vipType ?? 0), p.nickname, p.avatarUrl].join('|') : '';
+        let lastKey = profileKeyOf(user);
+        const poll = async () => {
+            try {
+                const profile = await omni.getLoginStatus('netease');
+                if (disposed || !profile) return; // 网络抖动/临时失败：静默保留本地登录态
+                const key = profileKeyOf(profile);
+                if (key === lastKey) return;
+                lastKey = key;
+                setUser(profile);
+                updateProviderAccount('netease', {
+                    status: 'authenticated',
+                    user: profile,
+                    hydration: 'ready',
+                    freshness: 'fresh',
+                    error: undefined,
+                });
+            } catch { /* 静默：后台轮询不打扰用户 */ }
+        };
+        const timer = window.setInterval(poll, 60_000);
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') void poll();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => {
+            disposed = true;
+            window.clearInterval(timer);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, [isUserDataReady, user, updateProviderAccount]);
+
     const handleClearCache = useCallback(async () => {
         const preserveKeys = [
             ...Object.values(NETEASE_USER_CACHE_KEYS),
