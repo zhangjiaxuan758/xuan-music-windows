@@ -202,6 +202,11 @@ async function downloadApk(info: UpdateInfo) {
       if (!Capacitor.isNativePlatform()) throw e1;
       bytes = await nativeFallbackBytes(url, ui);
     }
+    // 下载完整性：ZIP 魔数 + 最小体积，避免截断包被写入/安装后出现默认图标或打不开
+    if (bytes.length < 1024 * 1024) throw new Error('安装包不完整，请重试');
+    if (bytes[0] !== 0x50 || bytes[1] !== 0x4b || bytes[2] !== 0x03 || bytes[3] !== 0x04) {
+      throw new Error('安装包格式错误，请重试');
+    }
     const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/vnd.android.package-archive' });
     const path = await writeApkToPrivate(blob);
     ui.set(100, '下载完成');

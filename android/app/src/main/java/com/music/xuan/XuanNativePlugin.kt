@@ -258,6 +258,35 @@ class XuanNativePlugin : Plugin() {
         if (path.isNullOrEmpty()) { call.reject("missing path"); return }
         val file = File(path)
         if (!file.exists() || file.length() < 1024 * 1024) { call.reject("invalid apk"); return }
+        // 完整性校验：ZIP 魔数 "PK\u0003\u0004" + 尾部 EOCD 签名，
+        // 防止下载被截断的 APK 被安装（否则会出现默认图标 / 打不开）。
+        try {
+            java.io.RandomAccessFile(file, "r").use { raf ->
+                val head = ByteArray(4)
+                raf.seek(0)
+                if (raf.read(head) != 4 || head[0].toInt() != 0x50 || head[1].toInt() != 0x4B ||
+                    head[2].toInt() != 0x03 || head[3].toInt() != 0x04) {
+                    call.reject("apk header invalid (truncated download)"); return
+                }
+                val len = raf.length()
+                if (len < 22) { call.reject("apk too short"); return }
+                val scan = (len - 22 - 65535).coerceAtLeast(0)
+                raf.seek(scan)
+                val tailSize = (len - scan).toInt().coerceAtMost(65557)
+                val tail = ByteArray(tailSize)
+                raf.read(tail)
+                var eocd = false
+                var i = tail.size - 4
+                while (i >= 0) {
+                    if (tail[i].toInt() == 0x50 && tail[i + 1].toInt() == 0x4B &&
+                        tail[i + 2].toInt() == 0x05 && tail[i + 3].toInt() == 0x06) { eocd = true; break }
+                    i--
+                }
+                if (!eocd) { call.reject("apk zip incomplete (truncated download)"); return }
+            }
+        } catch (e: Exception) {
+            call.reject("apk verify failed: ${e.message}"); return
+        }
         try {
             val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             val intent = Intent(Intent.ACTION_VIEW).apply {
