@@ -19,7 +19,7 @@ export const XuanHelpDoc: React.FC<{ isDaylight: boolean }> = ({ isDaylight }) =
         <div className="space-y-3" data-xuan-help-doc>
             <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>小轩音乐 · 使用与问题排查</div>
             <div className="text-xs opacity-60" style={{ color: 'var(--text-secondary)' }}>
-                版本 1.6.5 · com.music.xuan · Android 10–16 横屏全屏
+                版本 {__APP_VERSION__} · com.music.xuan · Android 10–16 横屏全屏
             </div>
             {sections.map(s => (
                 <div key={s.title} className={`rounded-xl border p-3 ${card}`}>

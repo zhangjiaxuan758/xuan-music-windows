@@ -36,7 +36,7 @@ export const AiHelpPromptModal: React.FC<AiHelpPromptModalProps> = ({
         guideUrl: FOLIA_GUIDE_URL,
         repoUrl: FOLIA_REPOSITORY_URL,
         defaultValue: [
-            '我正在使用「小轩音乐」Android 版（1.6.5 / com.music.xuan），遇到一个问题需要帮助。',
+            `我正在使用「小轩音乐」Android 版（${__APP_VERSION__} / com.music.xuan），遇到一个问题需要帮助。`,
             '',
             `使用说明：${FOLIA_GUIDE_URL}`,
             `源码仓库：${FOLIA_REPOSITORY_URL}`,

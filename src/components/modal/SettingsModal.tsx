@@ -1270,7 +1270,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                             >
                                                 {t('help.madeBy') || "Made by"}
                                             </button>{' '}
-                                            <span className="opacity-70">小轩音乐 1.6.5 · com.music.xuan</span>
+                                            <span className="opacity-70">小轩音乐 {__APP_VERSION__} · com.music.xuan</span>
                                             <a
                                                 href="https://github.com/zhangjiaxuan758/xuan-music"
                                                 target="_blank"

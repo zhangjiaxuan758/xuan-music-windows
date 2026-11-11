@@ -3,7 +3,7 @@
 Unicode true
 
 !define APPNAME "小轩音乐"
-!define APPVERSION "1.6.9"
+!define APPVERSION "1.7.3"
 !define APPEXE "xuan-music.exe"
 !define PUBLISHER "小轩音乐"
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\XuanMusicDesktop"

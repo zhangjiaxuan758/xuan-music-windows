@@ -194,11 +194,18 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
   // 客户端在线更新依赖真实 versionCode：直接以 android/app/build.gradle 为唯一来源注入，
   // 避免前端里写死的兜底值与 APK 版本漂移，导致「装了新版仍反复弹更新」。
   let xuanVersionCode = 10625;
+  let xuanVersionName = '';
   try {
     const gradleText = fs.readFileSync(path.resolve(__dirname, 'android/app/build.gradle'), 'utf-8');
-    const m = /versionCode\s+(\d+)/.exec(gradleText);
-    if (m) xuanVersionCode = Number(m[1]);
+    const mCode = /versionCode\s+(\d+)/.exec(gradleText);
+    if (mCode) xuanVersionCode = Number(mCode[1]);
+    const mName = /versionName\s+"([^"]+)"/.exec(gradleText);
+    if (mName) xuanVersionName = mName[1];
   } catch { /* 非 Android 工程时保留兜底 */ }
+  // 版本名单一来源：build.gradle 的 versionName（package.json 长期停在旧值，
+  // 曾导致每版装完「关于」仍显示同一版本号）。
+  const packageVersion = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')).version;
+  const displayVersion = xuanVersionName || packageVersion;
 
   return {
     base: process.env.ELECTRON === 'true' || isCapacitorBuild ? './' : '/',
@@ -260,7 +267,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     define: {
       '__COMMIT_HASH__': JSON.stringify(commitHash + commitSuffix),
       '__GIT_BRANCH__': JSON.stringify(gitBranch),
-      '__APP_VERSION__': JSON.stringify(JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')).version),
+      '__APP_VERSION__': JSON.stringify(displayVersion),
       '__APP_VERSION_LABEL__': JSON.stringify(appVersionLabel),
       '__APP_RELEASE_CHANNEL__': JSON.stringify(appReleaseChannel),
       '__DOCKER_STACK_VERSION__': JSON.stringify(dockerStackVersion),
